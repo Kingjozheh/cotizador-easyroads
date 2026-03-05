@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizador EasyRoads</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         :root {
             --bg: #0f0f0f;
@@ -33,14 +34,14 @@
         body {
             font-family: 'Outfit', sans-serif;
             background: #202124;
+            display: flex;
+            justify-content: center;
             color: var(--text);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
         }
 
         .wizard {
@@ -163,7 +164,9 @@
             font-family: 'Outfit', sans-serif;
             border: 1.5px solid var(--border);
             border-radius: var(--rs);
-            background: var(--bg);
+            background: #202124;
+            display: flex;
+            justify-content: center;
             color: var(--text);
             transition: all 0.25s;
             -webkit-appearance: none;
@@ -222,7 +225,9 @@
             border-radius: var(--rs);
             cursor: pointer;
             transition: all 0.25s;
-            background: var(--bg);
+            background: #202124;
+            display: flex;
+            justify-content: center;
             user-select: none;
         }
 
@@ -281,7 +286,9 @@
             align-items: center;
             justify-content: space-between;
             padding: 0.7rem 0.9rem;
-            background: var(--bg);
+            background: #202124;
+            display: flex;
+            justify-content: center;
             cursor: pointer;
             user-select: none;
             transition: background 0.2s;
@@ -379,7 +386,9 @@
             height: 26px;
             border: 1.5px solid var(--border);
             border-radius: 5px;
-            background: var(--bg);
+            background: #202124;
+            display: flex;
+            justify-content: center;
             color: var(--text-mid);
             font-size: 0.95rem;
             cursor: pointer;
@@ -592,7 +601,9 @@
         }
 
         .result-info {
-            background: var(--bg);
+            background: #202124;
+            display: flex;
+            justify-content: center;
             border: 1px solid var(--border);
             border-radius: var(--rs);
             padding: 1rem;
@@ -889,6 +900,7 @@
             </div>
             <div class="result-info" id="res-info"></div>
             <div class="plans" id="plans-c"></div>
+            <button class="btn-next" onclick="generatePDF()" style="margin-bottom:0.5rem;">?? Descargar Cotizaci�n PDF</button>
             <a id="btn-wa" class="btn-whatsapp" href="#" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor">
                     <path
                         d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z">
@@ -901,16 +913,6 @@
     </div>
 
     <script>
-        // ===== EMAILJS CONFIG =====
-        // REEMPLAZA estos valores con los tuyos de dashboard.emailjs.com
-        var EMAILJS_PUBLIC_KEY = 'wQLT-fIiwYVAE3-9B';
-        var EMAILJS_SERVICE_ID = 'service_q1ewnsm';
-        var EMAILJS_TEMPLATE_CONTACT = 'template_na6tvtr';    // Template "Contact Us" (notificación a ti)
-        var EMAILJS_TEMPLATE_AUTOREPLY = 'template_a18wpvh';  // Template "Auto-Reply" (respuesta al cliente)
-
-        (function () { emailjs.init(EMAILJS_PUBLIC_KEY); })();
-        // ==========================
-
         var WA = '56933441952';
         var STEPS = 11; var cur = 1;
         var D = { fragil: 'no', ao: 'cerca', ad: 'cerca', plan: '', price: 0 };
@@ -1049,7 +1051,7 @@
             var pE = 80000 + vol * 10000;
             var pP = 110000 + vol * 16000;
 
-            // Distance surcharge - $1250/km normal, $1400/km premium
+            // Distance surcharge
             if (km > 50) { var kmNormal = km * 1250; var kmPremium = km * 1400; pB += kmNormal; pE += kmNormal; pP += kmPremium; }
 
             // Access surcharges
@@ -1085,15 +1087,13 @@
             document.getElementById('res-info').innerHTML = info;
 
             var isRegional = km > 50;
-            var plans = [];
-            if (!isRegional) {
-                plans.push({ id: 'basica', name: 'EasyRoads Básica', ft: ['Solo transporte', 'Armado y desarmado: camas', 'Protección mobiliario: film', 'Embalaje de cajas: usted'], price: pB });
-            }
-            plans.push({ id: 'estandar', name: 'EasyRoads Estándar', ft: ['Chofer + 2 peonetas', 'Armado: camas + muebles básicos', 'Protección: film + frazada', 'Embalaje de cajas: usted'], price: pE, rec: true });
-            plans.push({ id: 'premium', name: 'EasyRoads Premium', ft: ['Equipo completo dedicado', 'Armado: camas + todos los muebles', 'Protección: film + frazada + cartón', 'Embalaje completo: empresa'], price: pP });
+            window.plansCalc = [];
+            if (!isRegional) window.plansCalc.push({ id: 'basica', name: 'EasyRoads Básica', ft: ['Solo transporte', 'Armado y desarmado: camas', 'Protección mobiliario: film', 'Embalaje de cajas: usted'], price: pB });
+            window.plansCalc.push({ id: 'estandar', name: 'EasyRoads Estándar', ft: ['Chofer + 2 peonetas', 'Armado: camas + muebles básicos', 'Protección: film + frazada', 'Embalaje de cajas: usted'], price: pE, rec: true });
+            window.plansCalc.push({ id: 'premium', name: 'EasyRoads Premium', ft: ['Equipo completo dedicado', 'Armado: camas + todos los muebles', 'Protección: film + frazada + cartón', 'Embalaje completo: empresa'], price: pP });
 
             var ph = '';
-            plans.forEach(function (p) {
+            window.plansCalc.forEach(function (p) {
                 ph += '<div class="plan' + (p.rec ? ' recommended selected' : '') + '" onclick="selPlan(this,\'' + p.id + '\',' + p.price + ')">';
                 if (p.rec) ph += '<div class="plan-badge">Recomendado</div>';
                 ph += '<div class="plan-name">' + p.name + '</div><ul class="plan-features">';
@@ -1104,7 +1104,7 @@
             D.plan = 'estandar'; D.price = pE;
             updWA();
 
-            // ===== ENVIAR EMAILS CON EMAILJS =====
+            // ENVIAR POR EMAIL
             var emailCliente = document.getElementById('f-email').value;
             var telefonoCliente = document.getElementById('f-tel').value;
             var apellido = document.getElementById('f-apellido').value;
@@ -1112,10 +1112,6 @@
             var destNombre = NM[dest] || dest;
             var distanciaTexto = km > 50 ? km + ' km' : 'Local Santiago';
 
-            // Resumen de precios según si es regional o local
-            var precioBasicoTxt = isRegional ? 'N/A (solo local)' : fCLP(pB);
-
-            // Params para la template "Contact Us" (te llega a ti)
             var paramsContacto = {
                 name: nombre + ' ' + apellido,
                 nombre: nombre + ' ' + apellido,
@@ -1128,19 +1124,18 @@
                 items_pesados: heavy,
                 fecha: fecha || 'No especificada',
                 fragil: D.fragil === 'si' ? 'Sí' : 'No',
-                precio_basico: precioBasicoTxt,
+                precio_basico: isRegional ? 'N/A' : fCLP(pB),
                 precio_estandar: fCLP(pE),
                 precio_premium: fCLP(pP),
                 message: getInvText() || 'Sin inventario detallado',
                 mensaje: getInvText() || 'Sin inventario detallado'
             };
 
-            // Params para la template "Auto-Reply" (le llega al cliente)
             var paramsAutoReply = {
                 name: nombre,
                 nombre: nombre,
-                email: emailCliente,
                 to_email: emailCliente,
+                email: emailCliente,
                 origen: origNombre,
                 destino: destNombre,
                 distancia: distanciaTexto,
@@ -1148,27 +1143,13 @@
                 items_pesados: heavy,
                 fecha: fecha || 'No especificada',
                 fragil: D.fragil === 'si' ? 'Sí' : 'No',
-                precio_basico: precioBasicoTxt,
+                precio_basico: isRegional ? 'N/A' : fCLP(pB),
                 precio_estandar: fCLP(pE),
                 precio_premium: fCLP(pP)
             };
 
-            // Verificar que emailjs está cargado
-            if (typeof emailjs === 'undefined') {
-                alert('ERROR: EmailJS SDK no se cargó. Asegúrate de tener conexión a internet.');
-                return;
-            }
-
-            // Enviar notificación a ti (Contact Us)
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CONTACT, paramsContacto)
-                .then(function (r) { console.log('Email contacto enviado:', r.status); alert('✅ Email de notificación enviado correctamente!'); })
-                .catch(function (e) { console.error('Error email contacto:', e); alert('❌ Error enviando email contacto: ' + JSON.stringify(e)); });
-
-            // Enviar auto-reply al cliente
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, paramsAutoReply)
-                .then(function (r) { console.log('Auto-reply enviado:', r.status); alert('✅ Auto-reply al cliente enviado!'); })
-                .catch(function (e) { console.error('Error auto-reply:', e); alert('❌ Error enviando auto-reply: ' + JSON.stringify(e)); });
-            // ======================================
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CONTACT, paramsContacto).catch(e => console.error(e));
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, paramsAutoReply).catch(e => console.error(e));
         }
 
         function selPlan(el, id, pr) { document.querySelectorAll('.plan').forEach(function (p) { p.classList.remove('selected'); }); el.classList.add('selected'); D.plan = id; D.price = pr; updWA(); }
