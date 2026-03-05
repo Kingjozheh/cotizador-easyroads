@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preguntas Frecuentes - EasyRoads</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #202124;
+    --bg-card: #2a2a2d;
+    --bg-card-hover: #32323a;
+    --gold: #D4A843;
+    --gold-dim: rgba(212, 168, 67, 0.15);
+    --gold-border: rgba(212, 168, 67, 0.3);
+    --text: #e8e8e8;
+    --text-dim: #a0a0a0;
+    --green-wa: #25D366;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* === HERO SECTION === */
+  .faq-hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .faq-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(212,168,67,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .faq-hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    letter-spacing: 4px;
+    color: var(--gold);
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .faq-hero p {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .faq-hero .divider {
+    width: 60px;
+    height: 3px;
+    background: var(--gold);
+    margin: 20px auto 0;
+    border-radius: 2px;
+  }
+
+  /* === CATEGORIES === */
+  .faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  .faq-category {
+    margin-bottom: 40px;
+  }
+
+  .faq-category-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 16px;
+    padding-left: 14px;
+    border-left: 3px solid var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .faq-category-title .cat-icon {
+    font-size: 1.2rem;
+  }
+
+  /* === ACCORDION === */
+  .faq-item {
+    background: var(--bg-card);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .faq-item:hover {
+    border-color: var(--gold-border);
+  }
+
+  .faq-item.active {
+    border-color: var(--gold-border);
+    box-shadow: 0 4px 20px rgba(212, 168, 67, 0.08);
+  }
+
+  .faq-question {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+    padding: 18px 50px 18px 20px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .faq-question:hover {
+    color: var(--gold);
+  }
+
+  .faq-item.active .faq-question {
+    color: var(--gold);
+  }
+
+  .faq-question::after {
+    content: '+';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--gold);
+    transition: transform 0.3s ease;
+  }
+
+  .faq-item.active .faq-question::after {
+    content: '−';
+    transform: translateY(-50%) rotate(0deg);
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+  }
+
+  .faq-item.active .faq-answer {
+    max-height: 300px;
+  }
+
+  .faq-answer-inner {
+    padding: 0 20px 20px;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  /* === CTA SECTION === */
+  .faq-cta {
+    text-align: center;
+    padding: 40px 20px;
+    margin: 0 auto;
+    max-width: 800px;
+  }
+
+  .faq-cta-box {
+    background: var(--bg-card);
+    border: 1px solid var(--gold-border);
+    border-radius: 14px;
+    padding: 40px 30px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .faq-cta-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .faq-cta-box h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .faq-cta-box p {
+    color: var(--text-dim);
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-wa);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+  }
+
+  .btn-cotizador {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--gold);
+    padding: 14px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: 2px solid var(--gold);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .btn-cotizador:hover {
+    background: var(--gold-dim);
+    transform: translateY(-2px);
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 600px) {
+    .faq-hero h1 { font-size: 2.5rem; }
+    .faq-hero { padding: 40px 16px 30px; }
+    .faq-container { padding: 0 16px 40px; }
+    .faq-question { font-size: 0.92rem; padding: 16px 44px 16px 16px; }
+    .faq-answer-inner { font-size: 0.9rem; padding: 0 16px 16px; }
+    .faq-cta-box { padding: 30px 20px; }
+    .cta-buttons { flex-direction: column; align-items: center; }
+  }
+
+  /* === FADE IN ANIMATION === */
+  .faq-item {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fadeUp 0.4s ease forwards;
+  }
+
+  .faq-item:nth-child(1) { animation-delay: 0.05s; }
+  .faq-item:nth-child(2) { animation-delay: 0.1s; }
+  .faq-item:nth-child(3) { animation-delay: 0.15s; }
+  .faq-item:nth-child(4) { animation-delay: 0.2s; }
+  .faq-item:nth-child(5) { animation-delay: 0.25s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="faq-hero">
+  <h1>PREGUNTAS FRECUENTES</h1>
+  <p>Todo lo que necesitas saber sobre nuestros servicios de mudanza y arriendo de vehículos</p>
+  <div class="divider"></div>
+</section>
+
+<!-- FAQ CONTENT -->
+<div class="faq-container">
+
+  <!-- CATEGORY: SERVICIOS -->
+  <div class="faq-category">
+    <div class="faq-category-title">
+      <span class="cat-icon">🚚</span> SERVICIOS DE MUDANZA
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Qué incluye el servicio de mudanza?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Depende del plan que elijas. Nuestro plan <strong>Básico</strong> incluye transporte en camión cerrado con seguro de carga. El <strong>Estándar</strong> suma chofer + 2 peonetas con carga y descarga profesional. El <strong>Premium</strong> incluye embalaje completo, desarme y armado de muebles, y protección con film, frazada y cartón.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Cubren regiones o solo Santiago?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Cubrimos <strong>todo Chile</strong>. Realizamos mudanzas dentro de la Región Metropolitana y también traslados interregionales a cualquier destino del país, desde Arica hasta Punta Arenas.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Realizan mudanzas los fines de semana?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Sí, operamos de <strong>lunes a sábado</strong>. Domingos y festivos con disponibilidad previa consulta y recargo adicional.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Con cuánta anticipación debo reservar?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Recomendamos reservar con al menos <strong>48 horas de anticipación</strong>. Para mudanzas interregionales o de gran volumen, idealmente con una semana antes para asegurar disponibilidad.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY: PRECIOS -->
+  <div class="faq-category">
+    <div class="faq-category-title">
+      <span class="cat-icon">💰</span> PRECIOS Y COTIZACIÓN
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Cómo se calcula el precio de mi mudanza?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          El precio depende de la <strong>distancia, volumen de carga y tipo de servicio</strong>. Usa nuestro cotizador en línea para obtener un precio estimado en segundos, o contáctanos por WhatsApp para una cotización personalizada.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Los precios del cotizador son finales?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Son <strong>precios referenciales</strong>. El monto final puede variar según condiciones específicas como acceso al domicilio, pisos sin ascensor, o volumen adicional. Siempre confirmamos el precio final antes de agendar tu mudanza.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Puedo cambiar la fecha de mi mudanza?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Sí, puedes reagendar <strong>sin costo</strong> con al menos 24 horas de anticipación. Contáctanos por WhatsApp para coordinar la nueva fecha.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY: SEGURIDAD -->
+  <div class="faq-category">
+    <div class="faq-category-title">
+      <span class="cat-icon">🛡️</span> SEGURIDAD Y GARANTÍA
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Tienen seguro de carga?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Sí, todos nuestros servicios incluyen <strong>seguro de carga</strong> a través de nuestra póliza con Reale Seguros. Tu mudanza está protegida desde que cargamos hasta que entregamos en destino.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Qué pasa si se daña algo durante la mudanza?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Nuestro equipo trabaja con protección profesional: film plástico, frazadas y cartón según el plan contratado. En caso de cualquier incidente, nuestro <strong>seguro de carga cubre los daños</strong>. Nos hacemos responsables de tu tranquilidad.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿El camión tiene monitoreo GPS?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Sí, nuestro vehículo cuenta con <strong>monitoreo GPS en tiempo real</strong>, cumpliendo con los requisitos de nuestra póliza de seguro. Puedes tener total tranquilidad sobre la ubicación de tu carga en todo momento.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY: ARRIENDO -->
+  <div class="faq-category">
+    <div class="faq-category-title">
+      <span class="cat-icon">🔑</span> ARRIENDO DE VEHÍCULOS
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿También arriendan vehículos?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Sí, a través de EasyRoads ofrecemos <strong>arriendo de vehículos de trabajo</strong>. Contamos con camiones y utilitarios ideales para fletes, mudanzas pequeñas o traslados por cuenta propia. Consulta disponibilidad y tarifas en nuestra sección de Arriendos.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">¿Qué necesito para arrendar un vehículo?</button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">
+          Necesitas <strong>licencia de conducir vigente, cédula de identidad</strong> y firmar nuestro contrato de arriendo. También se requiere una garantía que se devuelve al entregar el vehículo en las mismas condiciones.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CTA SECTION -->
+<div class="faq-cta">
+  <div class="faq-cta-box">
+    <h2>¿TIENES OTRA PREGUNTA?</h2>
+    <p>Estamos listos para ayudarte. Escríbenos por WhatsApp o cotiza directamente en línea.</p>
+    <div class="cta-buttons">
+      <a href="https://wa.me/56933441952?text=Hola%2C%20tengo%20una%20consulta%20sobre%20los%20servicios%20de%20EasyRoads" target="_blank" class="btn-whatsapp">
+        <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        ESCRÍBENOS POR WHATSAPP
+      </a>
+      <a href="https://easyroads.cl/cotizador/" class="btn-cotizador">
+        COTIZAR EN LÍNEA →
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.faq-question').forEach(button => {
+    button.addEventListener('click', () => {
+      const item = button.parentElement;
+      const wasActive = item.classList.contains('active');
+      
+      // Close all items in the same category
+      item.closest('.faq-category').querySelectorAll('.faq-item').forEach(i => {
+        i.classList.remove('active');
+      });
+      
+      // Toggle clicked item
+      if (!wasActive) {
+        item.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
