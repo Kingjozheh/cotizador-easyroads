@@ -1,401 +1,1180 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cotizador EasyRoads</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#0f0f0f;--card:#1a1a1a;--border:#2a2a2a;--accent:#e8c547;--accent-dim:rgba(232,197,71,0.12);--green:#25D366;--green-h:#1eba56;--text:#f0f0f0;--text-mid:#aaa;--text-dim:#666;--r:14px;--rs:10px;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;margin:0;padding:0;}
-.wizard{max-width:560px;margin:0 auto;padding:0.5rem 1.2rem;}
-.progress-bar{display:flex;gap:4px;margin-bottom:2rem;padding:0 0.5rem;}
-.progress-step{flex:1;height:3px;background:var(--border);border-radius:2px;transition:background 0.4s;}
-.progress-step.active,.progress-step.done{background:var(--accent);}
-.wizard-header{text-align:center;margin-bottom:1.8rem;}
-.avatar{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#d4a83a);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.8rem;box-shadow:0 4px 20px rgba(232,197,71,0.25);}
-.wizard-header h2{font-size:1.3rem;font-weight:600;margin-bottom:0.3rem;line-height:1.4;}
-.wizard-header p{font-size:0.85rem;color:var(--text-dim);font-weight:300;}
-.step{display:none;animation:fadeIn 0.4s ease;}
-.step.active{display:block;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
-.step-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;position:relative;overflow:hidden;}
-.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.3;}
-.field{margin-bottom:1.1rem;}
-.field-label{display:block;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:0.4rem;}
-.field input,.field select{width:100%;padding:0.8rem 1rem;font-size:0.88rem;font-family:'Outfit',sans-serif;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--bg);color:var(--text);transition:all 0.25s;-webkit-appearance:none;appearance:none;}
-.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:2.5rem;}
-.field select option{background:#1a1a1a;color:#f0f0f0;}
-.field select optgroup{color:var(--accent);font-weight:600;}
-.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
-.field input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6);}
-.row{display:flex;gap:0.8rem;}
-.row .field{flex:1;}
-.option-group{display:flex;flex-direction:column;gap:0.5rem;}
-.option-item{display:flex;align-items:center;gap:0.8rem;padding:0.85rem 1rem;border:1.5px solid var(--border);border-radius:var(--rs);cursor:pointer;transition:all 0.25s;background:var(--bg);user-select:none;}
-.option-item:hover{border-color:var(--text-dim);}
-.option-item.selected{border-color:var(--accent);background:var(--accent-dim);}
-.option-dot{width:20px;height:20px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;transition:all 0.25s;position:relative;}
-.option-item.selected .option-dot{border-color:var(--accent);}
-.option-item.selected .option-dot::after{content:'';position:absolute;top:3px;left:3px;width:10px;height:10px;background:var(--accent);border-radius:50%;}
-.option-text{font-size:0.88rem;}.option-text-sub{font-size:0.75rem;color:var(--text-dim);}
-.inv-category{margin-bottom:0.6rem;border:1px solid var(--border);border-radius:var(--rs);overflow:hidden;}
-.inv-cat-header{display:flex;align-items:center;justify-content:space-between;padding:0.7rem 0.9rem;background:var(--bg);cursor:pointer;user-select:none;transition:background 0.2s;}
-.inv-cat-header:hover{background:#151515;}
-.cat-name{font-size:0.82rem;font-weight:500;display:flex;align-items:center;gap:0.4rem;}
-.cat-icon{font-size:0.95rem;}
-.cat-count{font-size:0.72rem;color:var(--accent);font-weight:600;}
-.cat-arrow{transition:transform 0.3s;color:var(--text-dim);font-size:0.75rem;}
-.inv-cat-header.open .cat-arrow{transform:rotate(180deg);}
-.inv-items{display:none;padding:0.4rem 0.9rem 0.6rem;background:var(--card);max-height:300px;overflow-y:auto;}
-.inv-items.open{display:block;}
-.inv-items::-webkit-scrollbar{width:4px;}
-.inv-items::-webkit-scrollbar-track{background:var(--card);}
-.inv-items::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.inv-item{display:flex;align-items:center;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--border);}
-.inv-item:last-child{border-bottom:none;}
-.inv-item-name{font-size:0.78rem;color:var(--text-mid);flex:1;}
-.inv-item-heavy{font-size:0.6rem;color:var(--accent);margin-left:0.3rem;}
-.inv-item-controls{display:flex;align-items:center;gap:0.4rem;}
-.inv-btn{width:26px;height:26px;border:1.5px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text-mid);font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:'Outfit',sans-serif;line-height:1;}
-.inv-btn:hover{border-color:var(--accent);color:var(--accent);}
-.inv-count{font-size:0.82rem;font-weight:600;min-width:18px;text-align:center;}
-.inv-summary{text-align:center;padding:0.8rem;background:var(--accent-dim);border-radius:var(--rs);margin-bottom:1rem;font-size:0.88rem;}
-.inv-summary span{font-weight:700;color:var(--accent);}
-.btn-next{width:100%;padding:1rem;font-size:0.88rem;font-weight:700;font-family:'Outfit',sans-serif;text-transform:uppercase;letter-spacing:1.5px;border:none;border-radius:var(--rs);cursor:pointer;background:var(--accent);color:#000;transition:all 0.3s;position:relative;overflow:hidden;margin-top:0.5rem;}
-.btn-next::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transition:left 0.5s;}
-.btn-next:hover::after{left:100%;}
-.btn-next:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,197,71,0.35);}
-.btn-back{width:100%;padding:0.7rem;font-size:0.78rem;font-family:'Outfit',sans-serif;font-weight:500;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;background:transparent;color:var(--text-dim);margin-top:0.5rem;transition:all 0.2s;}
-.btn-back:hover{border-color:var(--text-dim);color:var(--text-mid);}
-.plans{display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1.2rem;}
-.plan{border:1.5px solid var(--border);border-radius:var(--r);padding:1.2rem;cursor:pointer;transition:all 0.3s;position:relative;background:var(--card);}
-.plan:hover{border-color:var(--text-dim);}
-.plan.selected{border-color:var(--accent);background:var(--accent-dim);}
-.plan.recommended{border-color:var(--accent);}
-.plan-badge{position:absolute;top:-1px;right:16px;background:var(--accent);color:#000;font-size:0.6rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:0 0 6px 6px;text-transform:uppercase;letter-spacing:1px;}
-.plan-name{font-size:1rem;font-weight:700;margin-bottom:0.4rem;}
-.plan-features{list-style:none;margin-bottom:0.8rem;}
-.plan-features li{font-size:0.78rem;color:var(--text-mid);padding:0.15rem 0;display:flex;align-items:center;gap:0.4rem;}
-.plan-features li::before{content:'✓';color:var(--accent);font-weight:700;font-size:0.7rem;}
-.plan-price{font-size:1.6rem;font-weight:800;color:var(--accent);}
-.plan-price-sub{font-size:0.7rem;color:var(--text-dim);font-weight:400;}
-.btn-whatsapp{display:inline-flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;padding:0.95rem;font-size:0.82rem;font-weight:700;font-family:'Outfit',sans-serif;text-transform:uppercase;letter-spacing:1px;border:none;border-radius:var(--rs);cursor:pointer;background:var(--green);color:#fff;text-decoration:none;transition:all 0.3s;}
-.btn-whatsapp:hover{background:var(--green-h);transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,211,102,0.3);}
-.btn-whatsapp svg{width:18px;height:18px;}
-.result-info{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:1rem;margin-bottom:1rem;}
-.ri-row{display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.8rem;}
-.ri-row .l{color:var(--text-dim);}.ri-row .v{font-weight:600;}
-.loader{text-align:center;padding:3rem 1rem;}
-.loader-spinner{width:50px;height:50px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.loader p{color:var(--text-dim);font-size:0.9rem;}
-.nota-final{font-size:0.68rem;color:var(--text-dim);text-align:center;margin-top:1rem;font-style:italic;opacity:0.7;}
-.hidden{display:none;}
-@media(max-width:480px){.wizard{padding:1.5rem 0.8rem;}.step-card{padding:1.2rem;}.row{flex-direction:column;gap:0;}.plan-price{font-size:1.3rem;}.wizard-header h2{font-size:1.15rem;}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador EasyRoads</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --card: #1a1a1a;
+            --border: #2a2a2a;
+            --accent: #e8c547;
+            --accent-dim: rgba(232, 197, 71, 0.12);
+            --green: #25D366;
+            --green-h: #1eba56;
+            --text: #f0f0f0;
+            --text-mid: #aaa;
+            --text-dim: #666;
+            --r: 14px;
+            --rs: 10px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .wizard {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 0.5rem 1.2rem;
+        }
+
+        .progress-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 2rem;
+            padding: 0 0.5rem;
+        }
+
+        .progress-step {
+            flex: 1;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            transition: background 0.4s;
+        }
+
+        .progress-step.active,
+        .progress-step.done {
+            background: var(--accent);
+        }
+
+        .wizard-header {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #d4a83a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px rgba(232, 197, 71, 0.25);
+        }
+
+        .wizard-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            line-height: 1.4;
+        }
+
+        .wizard-header p {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.3;
+        }
+
+        .field {
+            margin-bottom: 1.1rem;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            margin-bottom: 0.4rem;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-size: 0.88rem;
+            font-family: 'Outfit', sans-serif;
+            border: 1.5px solid var(--border);
+            border-radius: var(--rs);
+            background: var(--bg);
+            color: var(--text);
+            transition: all 0.25s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .field select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 2.5rem;
+        }
+
+        .field select option {
+            background: #1a1a1a;
+            color: #f0f0f0;
+        }
+
+        .field select optgroup {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+
+        .field input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.6);
+        }
+
+        .row {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .row .field {
+            flex: 1;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.85rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--rs);
+            cursor: pointer;
+            transition: all 0.25s;
+            background: var(--bg);
+            user-select: none;
+        }
+
+        .option-item:hover {
+            border-color: var(--text-dim);
+        }
+
+        .option-item.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .option-dot {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: all 0.25s;
+            position: relative;
+        }
+
+        .option-item.selected .option-dot {
+            border-color: var(--accent);
+        }
+
+        .option-item.selected .option-dot::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .option-text {
+            font-size: 0.88rem;
+        }
+
+        .option-text-sub {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .inv-category {
+            margin-bottom: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            overflow: hidden;
+        }
+
+        .inv-cat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 0.9rem;
+            background: var(--bg);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .inv-cat-header:hover {
+            background: #151515;
+        }
+
+        .cat-name {
+            font-size: 0.82rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .cat-icon {
+            font-size: 0.95rem;
+        }
+
+        .cat-count {
+            font-size: 0.72rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .cat-arrow {
+            transition: transform 0.3s;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+        }
+
+        .inv-cat-header.open .cat-arrow {
+            transform: rotate(180deg);
+        }
+
+        .inv-items {
+            display: none;
+            padding: 0.4rem 0.9rem 0.6rem;
+            background: var(--card);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .inv-items.open {
+            display: block;
+        }
+
+        .inv-items::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .inv-items::-webkit-scrollbar-track {
+            background: var(--card);
+        }
+
+        .inv-items::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .inv-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .inv-item:last-child {
+            border-bottom: none;
+        }
+
+        .inv-item-name {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+            flex: 1;
+        }
+
+        .inv-item-heavy {
+            font-size: 0.6rem;
+            color: var(--accent);
+            margin-left: 0.3rem;
+        }
+
+        .inv-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .inv-btn {
+            width: 26px;
+            height: 26px;
+            border: 1.5px solid var(--border);
+            border-radius: 5px;
+            background: var(--bg);
+            color: var(--text-mid);
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1;
+        }
+
+        .inv-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .inv-count {
+            font-size: 0.82rem;
+            font-weight: 600;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .inv-summary {
+            text-align: center;
+            padding: 0.8rem;
+            background: var(--accent-dim);
+            border-radius: var(--rs);
+            margin-bottom: 1rem;
+            font-size: 0.88rem;
+        }
+
+        .inv-summary span {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .btn-next {
+            width: 100%;
+            padding: 1rem;
+            font-size: 0.88rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border: none;
+            border-radius: var(--rs);
+            cursor: pointer;
+            background: var(--accent);
+            color: #000;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .btn-next::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-next:hover::after {
+            left: 100%;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(232, 197, 71, 0.35);
+        }
+
+        .btn-back {
+            width: 100%;
+            padding: 0.7rem;
+            font-size: 0.78rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            border-color: var(--text-dim);
+            color: var(--text-mid);
+        }
+
+        .plans {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .plan {
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background: var(--card);
+        }
+
+        .plan:hover {
+            border-color: var(--text-dim);
+        }
+
+        .plan.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .plan.recommended {
+            border-color: var(--accent);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -1px;
+            right: 16px;
+            background: var(--accent);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0 0 6px 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .plan-name {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 0.8rem;
+        }
+
+        .plan-features li {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+            padding: 0.15rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+
+        .plan-price {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .plan-price-sub {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            width: 100%;
+            padding: 0.95rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: var(--rs);
+            cursor: pointer;
+            background: var(--green);
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-whatsapp:hover {
+            background: var(--green-h);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .result-info {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--rs);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ri-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            font-size: 0.8rem;
+        }
+
+        .ri-row .l {
+            color: var(--text-dim);
+        }
+
+        .ri-row .v {
+            font-weight: 600;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .nota-final {
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            text-align: center;
+            margin-top: 1rem;
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media(max-width:480px) {
+            .wizard {
+                padding: 1.5rem 0.8rem;
+            }
+
+            .step-card {
+                padding: 1.2rem;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .plan-price {
+                font-size: 1.3rem;
+            }
+
+            .wizard-header h2 {
+                font-size: 1.15rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="wizard">
-<div class="progress-bar" id="pbar"></div>
+    <div class="wizard">
+        <div class="progress-bar" id="pbar"></div>
 
-<!-- S1: NOMBRE -->
-<div class="step active" id="s-1">
-<div class="wizard-header"><div class="avatar">🚚</div><h2>¡Hola! Soy EasyRoads.<br>Vamos a cotizar tu mudanza</h2><p>Primero, necesitamos tu nombre</p></div>
-<div class="step-card">
-<div class="row"><div class="field"><span class="field-label">Nombre</span><input type="text" id="f-nombre" placeholder="Tu nombre"></div><div class="field"><span class="field-label">Apellido</span><input type="text" id="f-apellido" placeholder="Tu apellido"></div></div>
-<button class="btn-next" onclick="go(2)">Comencemos</button>
-</div></div>
+        <!-- S1: NOMBRE -->
+        <div class="step active" id="s-1">
+            <div class="wizard-header">
+                <div class="avatar">🚚</div>
+                <h2>¡Hola! Soy EasyRoads.<br>Vamos a cotizar tu mudanza</h2>
+                <p>Primero, necesitamos tu nombre</p>
+            </div>
+            <div class="step-card">
+                <div class="row">
+                    <div class="field"><span class="field-label">Nombre</span><input type="text" id="f-nombre"
+                            placeholder="Tu nombre"></div>
+                    <div class="field"><span class="field-label">Apellido</span><input type="text" id="f-apellido"
+                            placeholder="Tu apellido"></div>
+                </div>
+                <button class="btn-next" onclick="go(2)">Comencemos</button>
+            </div>
+        </div>
 
-<!-- S2: FECHA -->
-<div class="step" id="s-2">
-<div class="wizard-header"><div class="avatar">📅</div><h2 id="greet-fecha"></h2><p>¿Para cuándo necesitas la mudanza?</p></div>
-<div class="step-card">
-<div class="field"><span class="field-label">Fecha estimada</span><input type="date" id="f-fecha"></div>
-<button class="btn-next" onclick="go(3)">Siguiente</button>
-<button class="btn-back" onclick="go(1)">← Volver</button>
-</div></div>
+        <!-- S2: FECHA -->
+        <div class="step" id="s-2">
+            <div class="wizard-header">
+                <div class="avatar">📅</div>
+                <h2 id="greet-fecha"></h2>
+                <p>¿Para cuándo necesitas la mudanza?</p>
+            </div>
+            <div class="step-card">
+                <div class="field"><span class="field-label">Fecha estimada</span><input type="date" id="f-fecha"></div>
+                <button class="btn-next" onclick="go(3)">Siguiente</button>
+                <button class="btn-back" onclick="go(1)">← Volver</button>
+            </div>
+        </div>
 
-<!-- S3: ORIGEN -->
-<div class="step" id="s-3">
-<div class="wizard-header"><div class="avatar">📍</div><h2>¿Cuál es la dirección de origen?</h2><p>¿Desde dónde te mudas?</p></div>
-<div class="step-card">
-<div class="field"><span class="field-label">Tipo de vivienda</span><select id="f-tv-o"><option value="">Selecciona...</option><option value="depto">Departamento</option><option value="casa">Casa</option><option value="oficina">Oficina</option><option value="bodega">Bodega</option></select></div>
-<div class="field"><span class="field-label">Comuna o ciudad</span><select id="f-origen"></select></div>
-<button class="btn-next" onclick="go(4)">Siguiente</button>
-<button class="btn-back" onclick="go(2)">← Volver</button>
-</div></div>
+        <!-- S3: ORIGEN -->
+        <div class="step" id="s-3">
+            <div class="wizard-header">
+                <div class="avatar">📍</div>
+                <h2>¿Cuál es la dirección de origen?</h2>
+                <p>¿Desde dónde te mudas?</p>
+            </div>
+            <div class="step-card">
+                <div class="field"><span class="field-label">Tipo de vivienda</span><select id="f-tv-o">
+                        <option value="">Selecciona...</option>
+                        <option value="depto">Departamento</option>
+                        <option value="casa">Casa</option>
+                        <option value="oficina">Oficina</option>
+                        <option value="bodega">Bodega</option>
+                    </select></div>
+                <div class="field"><span class="field-label">Comuna o ciudad</span><select id="f-origen"></select></div>
+                <button class="btn-next" onclick="go(4)">Siguiente</button>
+                <button class="btn-back" onclick="go(2)">← Volver</button>
+            </div>
+        </div>
 
-<!-- S4: DESTINO -->
-<div class="step" id="s-4">
-<div class="wizard-header"><div class="avatar">🏠</div><h2>¿Y cuál es tu dirección de destino?</h2></div>
-<div class="step-card">
-<div class="field"><span class="field-label">Tipo de vivienda</span><select id="f-tv-d"><option value="">Selecciona...</option><option value="depto">Departamento</option><option value="casa">Casa</option><option value="oficina">Oficina</option><option value="bodega">Bodega</option></select></div>
-<div class="field"><span class="field-label">Comuna o ciudad</span><select id="f-destino"></select></div>
-<button class="btn-next" onclick="go(5)">Siguiente</button>
-<button class="btn-back" onclick="go(3)">← Volver</button>
-</div></div>
+        <!-- S4: DESTINO -->
+        <div class="step" id="s-4">
+            <div class="wizard-header">
+                <div class="avatar">🏠</div>
+                <h2>¿Y cuál es tu dirección de destino?</h2>
+            </div>
+            <div class="step-card">
+                <div class="field"><span class="field-label">Tipo de vivienda</span><select id="f-tv-d">
+                        <option value="">Selecciona...</option>
+                        <option value="depto">Departamento</option>
+                        <option value="casa">Casa</option>
+                        <option value="oficina">Oficina</option>
+                        <option value="bodega">Bodega</option>
+                    </select></div>
+                <div class="field"><span class="field-label">Comuna o ciudad</span><select id="f-destino"></select>
+                </div>
+                <button class="btn-next" onclick="go(5)">Siguiente</button>
+                <button class="btn-back" onclick="go(3)">← Volver</button>
+            </div>
+        </div>
 
-<!-- S5: FRAGIL -->
-<div class="step" id="s-5">
-<div class="wizard-header"><div class="avatar">🔮</div><h2>¿Algún mueble <u>muy</u> delicado?</h2><p>Por ejemplo, de cristal o vidrio grueso</p></div>
-<div class="step-card">
-<div class="option-group" id="og-fragil">
-<div class="option-item" data-value="si" onclick="selOpt(this,'fragil')"><span class="option-dot"></span><div><span class="option-text">Sí</span><br><span class="option-text-sub">Tengo objetos frágiles que necesitan cuidado especial</span></div></div>
-<div class="option-item selected" data-value="no" onclick="selOpt(this,'fragil')"><span class="option-dot"></span><div><span class="option-text">No</span><br><span class="option-text-sub">No hay objetos especialmente delicados</span></div></div>
-</div>
-<button class="btn-next" onclick="go(6)" style="margin-top:1rem;">Siguiente</button>
-<button class="btn-back" onclick="go(4)">← Volver</button>
-</div></div>
+        <!-- S5: FRAGIL -->
+        <div class="step" id="s-5">
+            <div class="wizard-header">
+                <div class="avatar">🔮</div>
+                <h2>¿Algún mueble <u>muy</u> delicado?</h2>
+                <p>Por ejemplo, de cristal o vidrio grueso</p>
+            </div>
+            <div class="step-card">
+                <div class="option-group" id="og-fragil">
+                    <div class="option-item" data-value="si" onclick="selOpt(this,'fragil')"><span
+                            class="option-dot"></span>
+                        <div><span class="option-text">Sí</span><br><span class="option-text-sub">Tengo objetos frágiles
+                                que necesitan cuidado especial</span></div>
+                    </div>
+                    <div class="option-item selected" data-value="no" onclick="selOpt(this,'fragil')"><span
+                            class="option-dot"></span>
+                        <div><span class="option-text">No</span><br><span class="option-text-sub">No hay objetos
+                                especialmente delicados</span></div>
+                    </div>
+                </div>
+                <button class="btn-next" onclick="go(6)" style="margin-top:1rem;">Siguiente</button>
+                <button class="btn-back" onclick="go(4)">← Volver</button>
+            </div>
+        </div>
 
-<!-- S6: ACCESO ORIGEN -->
-<div class="step" id="s-6">
-<div class="wizard-header"><div class="avatar">🚛</div><h2>En la dirección de <u>origen</u>, ¿el camión puede estacionar cerca?</h2></div>
-<div class="step-card">
-<div class="option-group" id="og-ao">
-<div class="option-item selected" data-value="cerca" onclick="selOpt(this,'ao')"><span class="option-dot"></span><div><span class="option-text">Sí, a menos de 40 metros</span></div></div>
-<div class="option-item" data-value="lejos" onclick="selOpt(this,'ao')"><span class="option-dot"></span><div><span class="option-text">No, a más de 40 metros</span></div></div>
-<div class="option-item" data-value="sub" onclick="selOpt(this,'ao')"><span class="option-dot"></span><div><span class="option-text">No, la entrada es por subterráneo</span></div></div>
-</div>
-<button class="btn-next" onclick="go(7)" style="margin-top:1rem;">Siguiente</button>
-<button class="btn-back" onclick="go(5)">← Volver</button>
-</div></div>
+        <!-- S6: ACCESO ORIGEN -->
+        <div class="step" id="s-6">
+            <div class="wizard-header">
+                <div class="avatar">🚛</div>
+                <h2>En la dirección de <u>origen</u>, ¿el camión puede estacionar cerca?</h2>
+            </div>
+            <div class="step-card">
+                <div class="option-group" id="og-ao">
+                    <div class="option-item selected" data-value="cerca" onclick="selOpt(this,'ao')"><span
+                            class="option-dot"></span>
+                        <div><span class="option-text">Sí, a menos de 40 metros</span></div>
+                    </div>
+                    <div class="option-item" data-value="lejos" onclick="selOpt(this,'ao')"><span
+                            class="option-dot"></span>
+                        <div><span class="option-text">No, a más de 40 metros</span></div>
+                    </div>
+                    <div class="option-item" data-value="sub" onclick="selOpt(this,'ao')"><span
+                            class="option-dot"></span>
+                        <div><span class="option-text">No, la entrada es por subterráneo</span></div>
+                    </div>
+                </div>
+                <button class="btn-next" onclick="go(7)" style="margin-top:1rem;">Siguiente</button>
+                <button class="btn-back" onclick="go(5)">← Volver</button>
+            </div>
+        </div>
 
-<!-- S7: ACCESO DESTINO -->
-<div class="step" id="s-7">
-<div class="wizard-header"><div class="avatar">🅿️</div><h2>¿Y en la dirección de <u>destino</u>?</h2></div>
-<div class="step-card">
-<div class="option-group" id="og-ad">
-<div class="option-item selected" data-value="cerca" onclick="selOpt(this,'ad')"><span class="option-dot"></span><div><span class="option-text">Sí, a menos de 40 metros</span></div></div>
-<div class="option-item" data-value="lejos" onclick="selOpt(this,'ad')"><span class="option-dot"></span><div><span class="option-text">No, a más de 40 metros</span></div></div>
-<div class="option-item" data-value="sub" onclick="selOpt(this,'ad')"><span class="option-dot"></span><div><span class="option-text">No, la entrada es por subterráneo</span></div></div>
-</div>
-<button class="btn-next" onclick="go(8)" style="margin-top:1rem;">Siguiente</button>
-<button class="btn-back" onclick="go(6)">← Volver</button>
-</div></div>
+        <!-- S7: ACCESO DESTINO -->
+        <div class="step" id="s-7">
+            <div class="wizard-header">
+                <div class="avatar">🅿️</div>
+                <h2>¿Y en la dirección de <u>destino</u>?</h2>
+            </div>
+            <div class="step-card">
+                <div class="option-group" id="og-ad">
+                    <div class="option-item selected" data-value="cerca" onclick="selOpt(this,'ad')"><span
+                            class="option-dot"></span>
+                        <div><span class="option-text">Sí, a menos de 40 metros</span></div>
+                    </div>
+                    <div class="option-item" data-value="lejos" onclick="selOpt(this,'ad')"><span
+                            class="option-dot"></span>
+                        <div><span class="option-text">No, a más de 40 metros</span></div>
+                    </div>
+                    <div class="option-item" data-value="sub" onclick="selOpt(this,'ad')"><span
+                            class="option-dot"></span>
+                        <div><span class="option-text">No, la entrada es por subterráneo</span></div>
+                    </div>
+                </div>
+                <button class="btn-next" onclick="go(8)" style="margin-top:1rem;">Siguiente</button>
+                <button class="btn-back" onclick="go(6)">← Volver</button>
+            </div>
+        </div>
 
-<!-- S8: INVENTARIO -->
-<div class="step" id="s-8">
-<div class="wizard-header"><div class="avatar">📦</div><h2>Agrega los ítems de tu inventario</h2><p>Así calculamos el volumen y peso exacto</p></div>
-<div class="inv-summary">Volumen: <span id="vol-t">0</span> m³ · Ítems: <span id="items-t">0</span> · Pesados: <span id="heavy-t">0</span></div>
-<div id="inv-container"></div>
-<div style="margin-top:1rem;">
-<button class="btn-next" onclick="go(9)">Siguiente</button>
-<button class="btn-back" onclick="go(7)">← Volver</button>
-</div></div>
+        <!-- S8: INVENTARIO -->
+        <div class="step" id="s-8">
+            <div class="wizard-header">
+                <div class="avatar">📦</div>
+                <h2>Agrega los ítems de tu inventario</h2>
+                <p>Así calculamos el volumen y peso exacto</p>
+            </div>
+            <div class="inv-summary">Volumen: <span id="vol-t">0</span> m³ · Ítems: <span id="items-t">0</span> ·
+                Pesados: <span id="heavy-t">0</span></div>
+            <div id="inv-container"></div>
+            <div style="margin-top:1rem;">
+                <button class="btn-next" onclick="go(9)">Siguiente</button>
+                <button class="btn-back" onclick="go(7)">← Volver</button>
+            </div>
+        </div>
 
-<!-- S9: CONTACTO -->
-<div class="step" id="s-9">
-<div class="wizard-header"><div class="avatar">📱</div><h2>Ingresa tu email y celular</h2><p>Para enviarte la cotización detallada</p></div>
-<div class="step-card">
-<div class="field"><span class="field-label">Email</span><input type="email" id="f-email" placeholder="tu@email.com"></div>
-<div class="field"><span class="field-label">Teléfono</span><div style="display:flex;align-items:center;gap:0.5rem;"><span style="font-size:0.88rem;color:var(--text-mid);white-space:nowrap;">🇨🇱 +56</span><input type="tel" id="f-tel" placeholder="9 1234 5678" style="flex:1;"></div></div>
-<button class="btn-next" onclick="go(10)">Calcular mi precio</button>
-<button class="btn-back" onclick="go(8)">← Volver</button>
-</div></div>
+        <!-- S9: CONTACTO -->
+        <div class="step" id="s-9">
+            <div class="wizard-header">
+                <div class="avatar">📱</div>
+                <h2>Ingresa tu email y celular</h2>
+                <p>Para enviarte la cotización detallada</p>
+            </div>
+            <div class="step-card">
+                <div class="field"><span class="field-label">Email</span><input type="email" id="f-email"
+                        placeholder="tu@email.com"></div>
+                <div class="field"><span class="field-label">Teléfono</span>
+                    <div style="display:flex;align-items:center;gap:0.5rem;"><span
+                            style="font-size:0.88rem;color:var(--text-mid);white-space:nowrap;">🇨🇱 +56</span><input
+                            type="tel" id="f-tel" placeholder="9 1234 5678" style="flex:1;"></div>
+                </div>
+                <button class="btn-next" onclick="go(10)">Calcular mi precio</button>
+                <button class="btn-back" onclick="go(8)">← Volver</button>
+            </div>
+        </div>
 
-<!-- S10: LOADING -->
-<div class="step" id="s-10">
-<div class="loader"><div class="loader-spinner"></div><p>Calculando tu precio...</p><p style="font-size:0.75rem;color:var(--text-dim);margin-top:0.5rem;">Analizando distancia, volumen y condiciones</p></div></div>
+        <!-- S10: LOADING -->
+        <div class="step" id="s-10">
+            <div class="loader">
+                <div class="loader-spinner"></div>
+                <p>Calculando tu precio...</p>
+                <p style="font-size:0.75rem;color:var(--text-dim);margin-top:0.5rem;">Analizando distancia, volumen y
+                    condiciones</p>
+            </div>
+        </div>
 
-<!-- S11: RESULTADO -->
-<div class="step" id="s-11">
-<div class="wizard-header"><div class="avatar">🎉</div><h2 id="res-title"></h2><p>Elige el plan que más te acomode</p></div>
-<div class="result-info" id="res-info"></div>
-<div class="plans" id="plans-c"></div>
-<a id="btn-wa" class="btn-whatsapp" href="#" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>Reservar por WhatsApp</a>
-<button class="btn-back" onclick="location.reload()">Nueva cotización</button>
-<p class="nota-final">* Precio referencial. El monto final puede variar según condiciones específicas del servicio.</p>
-</div>
-</div>
+        <!-- S11: RESULTADO -->
+        <div class="step" id="s-11">
+            <div class="wizard-header">
+                <div class="avatar">🎉</div>
+                <h2 id="res-title"></h2>
+                <p>Elige el plan que más te acomode</p>
+            </div>
+            <div class="result-info" id="res-info"></div>
+            <div class="plans" id="plans-c"></div>
+            <a id="btn-wa" class="btn-whatsapp" href="#" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z">
+                    </path>
+                </svg>Reservar por WhatsApp</a>
+            <button class="btn-back" onclick="location.reload()">Nueva cotización</button>
+            <p class="nota-final">* Precio referencial. El monto final puede variar según condiciones específicas del
+                servicio.</p>
+        </div>
+    </div>
 
-<script>
-var WA='56933441952';
-var STEPS=11;var cur=1;
-var D={fragil:'no',ao:'cerca',ad:'cerca',plan:'',price:0};
+    <script>
+        // ===== EMAILJS CONFIG =====
+        // REEMPLAZA estos valores con los tuyos de dashboard.emailjs.com
+        var EMAILJS_PUBLIC_KEY = 'wQLT-fliwYVAE3-9B';
+        var EMAILJS_SERVICE_ID = 'service_q1ewnsm';
+        var EMAILJS_TEMPLATE_CONTACT = 'template_na6tvtr';    // Template "Contact Us" (notificación a ti)
+        var EMAILJS_TEMPLATE_AUTOREPLY = 'template_a18wpvh';  // Template "Auto-Reply" (respuesta al cliente)
 
-var LOC_HTML='<option value="">Selecciona...</option><optgroup label="─── Santiago Centro ───"><option value="stgo_centro">Santiago Centro</option><option value="providencia">Providencia</option><option value="nunoa">Ñuñoa</option><option value="las_condes">Las Condes</option><option value="vitacura">Vitacura</option><option value="lo_barnechea">Lo Barnechea</option><option value="recoleta">Recoleta</option><option value="independencia">Independencia</option><option value="macul">Macul</option><option value="san_joaquin">San Joaquín</option></optgroup><optgroup label="─── Santiago Sur ───"><option value="la_florida">La Florida</option><option value="puente_alto">Puente Alto</option><option value="san_bernardo">San Bernardo</option><option value="la_pintana">La Pintana</option><option value="el_bosque">El Bosque</option><option value="la_cisterna">La Cisterna</option><option value="san_miguel">San Miguel</option><option value="la_granja">La Granja</option><option value="peñalolen">Peñalolén</option></optgroup><optgroup label="─── Santiago Norte ───"><option value="quilicura">Quilicura</option><option value="huechuraba">Huechuraba</option><option value="conchali">Conchalí</option><option value="renca">Renca</option><option value="colina">Colina</option><option value="lampa">Lampa</option></optgroup><optgroup label="─── Santiago Poniente ───"><option value="maipu">Maipú</option><option value="cerrillos">Cerrillos</option><option value="pudahuel">Pudahuel</option><option value="estacion_central">Estación Central</option><option value="quinta_normal">Quinta Normal</option><option value="padre_hurtado">Padre Hurtado</option><option value="peñaflor">Peñaflor</option><option value="talagante">Talagante</option></optgroup><optgroup label="─── Regiones ───"><option value="rancagua">Rancagua</option><option value="valparaiso">Valparaíso</option><option value="vina">Viña del Mar</option><option value="talca">Talca</option><option value="chillan">Chillán</option><option value="concepcion">Concepción</option><option value="temuco">Temuco</option><option value="valdivia">Valdivia</option><option value="osorno">Osorno</option><option value="pmontt">Puerto Montt</option><option value="laserena">La Serena</option><option value="copiapo">Copiapó</option><option value="antofagasta">Antofagasta</option><option value="iquique">Iquique</option><option value="arica">Arica</option><option value="parenas">Punta Arenas</option></optgroup>';
-document.getElementById('f-origen').innerHTML=LOC_HTML;
-document.getElementById('f-destino').innerHTML=LOC_HTML;
+        (function () { emailjs.init(EMAILJS_PUBLIC_KEY); })();
+        // ==========================
 
-var DIST={stgo_centro:0,providencia:5,nunoa:7,las_condes:10,vitacura:12,lo_barnechea:20,recoleta:4,independencia:3,macul:8,san_joaquin:7,la_florida:14,puente_alto:25,san_bernardo:20,la_pintana:18,el_bosque:15,la_cisterna:10,san_miguel:6,la_granja:13,peñalolen:12,quilicura:15,huechuraba:12,conchali:6,renca:8,colina:30,lampa:35,maipu:14,cerrillos:10,pudahuel:16,estacion_central:3,quinta_normal:4,padre_hurtado:30,peñaflor:35,talagante:40,rancagua:87,valparaiso:120,vina:120,talca:255,chillan:400,concepcion:500,temuco:680,valdivia:840,osorno:920,pmontt:1020,laserena:470,copiapo:800,antofagasta:1340,iquique:1780,arica:2050,parenas:3090};
-var NM={stgo_centro:'Santiago Centro',providencia:'Providencia',nunoa:'Ñuñoa',las_condes:'Las Condes',vitacura:'Vitacura',lo_barnechea:'Lo Barnechea',recoleta:'Recoleta',independencia:'Independencia',macul:'Macul',san_joaquin:'San Joaquín',la_florida:'La Florida',puente_alto:'Puente Alto',san_bernardo:'San Bernardo',la_pintana:'La Pintana',el_bosque:'El Bosque',la_cisterna:'La Cisterna',san_miguel:'San Miguel',la_granja:'La Granja',peñalolen:'Peñalolén',quilicura:'Quilicura',huechuraba:'Huechuraba',conchali:'Conchalí',renca:'Renca',colina:'Colina',lampa:'Lampa',maipu:'Maipú',cerrillos:'Cerrillos',pudahuel:'Pudahuel',estacion_central:'Estación Central',quinta_normal:'Quinta Normal',padre_hurtado:'Padre Hurtado',peñaflor:'Peñaflor',talagante:'Talagante',rancagua:'Rancagua',valparaiso:'Valparaíso',vina:'Viña del Mar',talca:'Talca',chillan:'Chillán',concepcion:'Concepción',temuco:'Temuco',valdivia:'Valdivia',osorno:'Osorno',pmontt:'Puerto Montt',laserena:'La Serena',copiapo:'Copiapó',antofagasta:'Antofagasta',iquique:'Iquique',arica:'Arica',parenas:'Punta Arenas'};
+        var WA = '56933441952';
+        var STEPS = 11; var cur = 1;
+        var D = { fragil: 'no', ao: 'cerca', ad: 'cerca', plan: '', price: 0 };
 
-// h=heavy(>40kg), v=volume m3
-var INV=[
-{name:'Camas',icon:'🛏️',items:[
-{n:'Cama King (incluye colchón)',v:2.2,h:1},{n:'Cama 2 Plazas (incluye colchón)',v:1.8,h:1},{n:'Cama 1½ Plaza (incluye colchón)',v:1.2,h:0},{n:'Cama 1 Plaza (incluye colchón)',v:0.8,h:0},{n:'Cama Nido (incluye colchón)',v:1.0,h:0},{n:'Camarote (incluye colchón)',v:1.8,h:1},{n:'Respaldo de cama pequeño',v:0.15,h:0},{n:'Cuna desarmable',v:0.3,h:0},{n:'Cuna no desarmable',v:0.4,h:0},{n:'Colchón King o 2 Plazas',v:0.8,h:1},{n:'Colchón 1 o 1½ Plaza',v:0.5,h:0},{n:'Cama clínica',v:1.5,h:1},{n:'Respaldo de cama mediano',v:0.2,h:0},{n:'Respaldo de cama grande',v:0.3,h:0},{n:'Base cama 1 plaza',v:0.4,h:0}]},
-{name:'Cómodas y Veladores',icon:'🗄️',items:[
-{n:'Velador',v:0.15,h:0},{n:'Cómoda',v:0.5,h:0},{n:'Estante',v:0.5,h:0},{n:'Repisa escalera',v:0.4,h:0},{n:'Biblioteca',v:0.8,h:1},{n:'Rack TV pequeño',v:0.25,h:0},{n:'Rack TV mediano',v:0.4,h:0},{n:'Rack TV grande',v:0.6,h:1},{n:'Bar',v:0.5,h:0},{n:'Vitrina o Buffet',v:0.8,h:1},{n:'Ropero',v:1.2,h:1},{n:'Zapatera',v:0.3,h:0}]},
-{name:'Mesas',icon:'🪑',items:[
-{n:'Arrimo',v:0.2,h:0},{n:'Escritorio mediano',v:0.4,h:0},{n:'Escritorio grande',v:0.6,h:1},{n:'Escritorio mediano de vidrio',v:0.4,h:0},{n:'Escritorio grande de vidrio',v:0.6,h:1},{n:'Mesa de centro',v:0.3,h:0},{n:'Mesa de centro de vidrio',v:0.3,h:0},{n:'Mesa lateral/nido',v:0.15,h:0},{n:'Mesa lateral/nido de vidrio',v:0.15,h:0},{n:'Mesa de cocina',v:0.4,h:0},{n:'Mesa comedor 4 personas',v:0.6,h:0},{n:'Mesa comedor 6 personas',v:1.0,h:1},{n:'Mesa comedor 8 personas',v:1.3,h:1},{n:'Mesa comedor 10 personas',v:1.6,h:1},{n:'Mesa comedor vidrio 4 pers.',v:0.6,h:0},{n:'Mesa comedor vidrio 6 pers.',v:1.0,h:1},{n:'Mesa comedor vidrio 8 pers.',v:1.3,h:1},{n:'Mesa comedor vidrio 10 pers.',v:1.6,h:1},{n:'Tocador',v:0.4,h:0},{n:'Mesa plegable',v:0.2,h:0}]},
-{name:'Sofás',icon:'🛋️',items:[
-{n:'Sitial',v:0.5,h:0},{n:'Sillón',v:0.6,h:0},{n:'Sofá 2 cuerpos',v:1.2,h:1},{n:'Sofá 3 cuerpos',v:1.8,h:1},{n:'Sofá 4 cuerpos',v:2.4,h:1},{n:'Sillón en L',v:2.5,h:1},{n:'Futón/Sofá cama 1 plaza',v:0.8,h:1},{n:'Futón/Sofá cama 2 plazas',v:1.2,h:1},{n:'Puf',v:0.3,h:0},{n:'Bergere',v:0.6,h:0}]},
-{name:'Sillas',icon:'💺',items:[
-{n:'Silla de comedor',v:0.15,h:0},{n:'Silla de cocina',v:0.12,h:0},{n:'Silla de escritorio',v:0.25,h:0},{n:'Silla reclinable',v:0.4,h:0},{n:'Silla mecedora',v:0.4,h:0},{n:'Piso de baja altura',v:0.1,h:0},{n:'Piso alto',v:0.15,h:0},{n:'Silla plegable',v:0.08,h:0},{n:'Piso plástico apilable',v:0.05,h:0},{n:'Banqueta comedor',v:0.1,h:0}]},
-{name:'Cocina',icon:'🍳',items:[
-{n:'Refrigerador 1 puerta',v:0.8,h:1},{n:'Refrigerador 2 puertas Side by Side',v:1.2,h:1},{n:'Congeladora o Freezer',v:0.7,h:1},{n:'Frigobar',v:0.2,h:0},{n:'Cava de vinos',v:0.3,h:0},{n:'Cocina',v:0.7,h:1},{n:'Horno eléctrico',v:0.15,h:0},{n:'Microonda',v:0.1,h:0},{n:'Lavadora',v:0.5,h:1},{n:'Secadora',v:0.5,h:1},{n:'Lavavajilla',v:0.4,h:1},{n:'Artefactos pequeños',v:0.05,h:0}]},
-{name:'Electrónica',icon:'📺',items:[
-{n:'TV pequeña',v:0.1,h:0},{n:'TV mediana',v:0.15,h:0},{n:'TV grande',v:0.25,h:0},{n:'TV gigante',v:0.35,h:0},{n:'Computador de escritorio',v:0.15,h:0},{n:'Impresora pequeña',v:0.08,h:0},{n:'Impresora mediana',v:0.15,h:0},{n:'Equipo de música',v:0.2,h:0},{n:'Aspiradora',v:0.1,h:0},{n:'AC portátil',v:0.2,h:0}]},
-{name:'Lámparas',icon:'💡',items:[
-{n:'Lámpara de noche',v:0.05,h:0},{n:'Lámpara de pie',v:0.1,h:0},{n:'Lámpara colgante',v:0.08,h:0},{n:'Lámpara colgante de vidrio',v:0.1,h:0}]},
-{name:'Terraza',icon:'🌿',items:[
-{n:'Mesa de centro terraza',v:0.3,h:0},{n:'Sofá terraza',v:1.0,h:0},{n:'Sillón 2 cuerpos terraza',v:0.8,h:0},{n:'Sillón 3 cuerpos terraza',v:1.2,h:1},{n:'Silla de terraza',v:0.12,h:0},{n:'Mesa comedor terraza 4 pers.',v:0.6,h:0},{n:'Mesa comedor terraza 6 pers.',v:1.0,h:1},{n:'Banca',v:0.3,h:0},{n:'Macetero pequeño liviano',v:0.05,h:0},{n:'Macetero grande pesado',v:0.2,h:1},{n:'Parrilla',v:0.5,h:1},{n:'Escalera pesada',v:0.3,h:1},{n:'Casa de perro pequeña',v:0.2,h:0},{n:'Casa de perro grande',v:0.5,h:1},{n:'Silla Acapulco',v:0.3,h:0},{n:'Reposera',v:0.3,h:0},{n:'Macetero grande pesado (+50kg)',v:0.25,h:1},{n:'Toldo',v:0.2,h:0},{n:'Silla colgante',v:0.4,h:0}]},
-{name:'Misceláneos',icon:'🎸',items:[
-{n:'Alfombra pequeña',v:0.1,h:0},{n:'Alfombra grande',v:0.3,h:0},{n:'Baúl',v:0.3,h:0},{n:'Biombo',v:0.2,h:0},{n:'Canasto',v:0.1,h:0},{n:'Cuadros pequeños',v:0.05,h:0},{n:'Cuadros grandes',v:0.1,h:0},{n:'Espejos',v:0.1,h:0},{n:'Estufa a gas',v:0.15,h:0},{n:'Estufa eléctrica pequeña',v:0.08,h:0},{n:'Estufa eléctrica grande',v:0.2,h:0},{n:'Bicicleta',v:0.3,h:0},{n:'Bolso de golf y palos',v:0.15,h:0},{n:'Trotadora/Elíptica',v:0.5,h:1},{n:'Mesa de ping pong',v:0.8,h:1},{n:'Mesa de taca taca',v:0.6,h:1},{n:'Cama elástica',v:0.5,h:0},{n:'Rascador de gatos',v:0.15,h:0},{n:'Órgano eléctrico',v:0.4,h:1},{n:'Guitarra/Bajo',v:0.1,h:0},{n:'Piano vertical (sin cola)',v:1.0,h:1},{n:'Piano de cola',v:2.5,h:1},{n:'Perchero',v:0.1,h:0},{n:'Mesa de planchado',v:0.1,h:0},{n:'Banco de pesas',v:0.3,h:1},{n:'Disco de pesa',v:0.02,h:1},{n:'Casa de niños plástica',v:0.5,h:0},{n:'Ventilador',v:0.1,h:0},{n:'Pelota de pilates',v:0.1,h:0},{n:'Escalera plegable pequeña',v:0.1,h:0},{n:'Escalera plegable grande',v:0.2,h:0},{n:'Almohada',v:0.03,h:0},{n:'Cojín',v:0.02,h:0},{n:'Dispensador de agua',v:0.15,h:0},{n:'Colgador de ropa',v:0.1,h:0},{n:'Tabla de surf',v:0.2,h:0},{n:'Tabla de snowboard',v:0.1,h:0},{n:'Bidón (20 litros)',v:0.05,h:0},{n:'Cooler',v:0.08,h:0}]},
-{name:'Oficinas Corporativas',icon:'🏢',items:[
-{n:'Estación trabajo desarmable 1p',v:0.5,h:0},{n:'Estación trabajo desarmable 2p',v:1.0,h:1},{n:'Estación trabajo desarmable 3p',v:1.5,h:1},{n:'Estación trabajo desarmable 4p',v:2.0,h:1},{n:'Estación trabajo no desarmable 1p',v:0.6,h:1},{n:'Estación trabajo no desarmable 2p',v:1.2,h:1},{n:'Estación trabajo no desarmable 3p',v:1.8,h:1},{n:'Estación trabajo no desarmable 4p',v:2.4,h:1},{n:'Escritorio mediano desarmable',v:0.4,h:0},{n:'Escritorio grande desarmable',v:0.6,h:0},{n:'Escritorio mediano no desarmable',v:0.5,h:1},{n:'Escritorio grande no desarmable',v:0.7,h:1},{n:'Mesa reunión 4 pers.',v:0.8,h:1},{n:'Mesa reunión 6 pers.',v:1.0,h:1},{n:'Mesa reunión 8 pers.',v:1.3,h:1},{n:'Mesa reunión 10 pers.',v:1.6,h:1},{n:'Mesa reunión 12 pers.',v:2.0,h:1},{n:'Archivador pequeño',v:0.2,h:0},{n:'Archivador mediano',v:0.3,h:1},{n:'Archivador grande',v:0.5,h:1},{n:'Monitor 15-20"',v:0.08,h:0},{n:'Monitor 20-25"',v:0.1,h:0},{n:'Monitor 25-30"',v:0.12,h:0},{n:'Combo PC sin monitor',v:0.08,h:0},{n:'Impresora pequeña',v:0.08,h:0},{n:'Impresora mediana',v:0.15,h:0},{n:'Fotocopiadora grande',v:0.6,h:1},{n:'Pizarra',v:0.15,h:0}]},
-{name:'Industriales',icon:'🏭',items:[
-{n:'Cocina industrial',v:0.8,h:1},{n:'Freidora industrial',v:0.3,h:1},{n:'Horno industrial',v:1.0,h:1},{n:'Mesa fría industrial',v:0.8,h:1},{n:'Mesa de trabajo industrial',v:0.6,h:1},{n:'Plancha industrial',v:0.3,h:1},{n:'Refrigerador/Congelador horizontal',v:1.0,h:1},{n:'Refrigerador industrial dúplex',v:1.5,h:1},{n:'Refrigerador industrial',v:1.2,h:1},{n:'Lavaplatos industrial',v:0.6,h:1},{n:'Batidora industrial',v:0.2,h:1},{n:'Vitrina refrigerada',v:0.8,h:1},{n:'Campana industrial',v:0.4,h:1}]},
-{name:'Cajas y Maletas',icon:'📦',items:[
-{n:'Caja de cocina',v:0.06,h:0},{n:'Caja de adornos',v:0.04,h:0},{n:'Caja de ropa',v:0.06,h:0},{n:'Contenedor plástico (100L)',v:0.1,h:0},{n:'Maleta pequeña',v:0.06,h:0},{n:'Maleta grande',v:0.12,h:0},{n:'Bolsa o bulto',v:0.05,h:0},{n:'Caja de herramientas',v:0.04,h:0},{n:'Caja fuerte de closet',v:0.08,h:1},{n:'Caja fuerte vertical',v:0.15,h:1},{n:'Contenedor plástico (50L)',v:0.05,h:0}]}
-];
+        var LOC_HTML = '<option value="">Selecciona...</option><optgroup label="─── Santiago Centro ───"><option value="stgo_centro">Santiago Centro</option><option value="providencia">Providencia</option><option value="nunoa">Ñuñoa</option><option value="las_condes">Las Condes</option><option value="vitacura">Vitacura</option><option value="lo_barnechea">Lo Barnechea</option><option value="recoleta">Recoleta</option><option value="independencia">Independencia</option><option value="macul">Macul</option><option value="san_joaquin">San Joaquín</option></optgroup><optgroup label="─── Santiago Sur ───"><option value="la_florida">La Florida</option><option value="puente_alto">Puente Alto</option><option value="san_bernardo">San Bernardo</option><option value="la_pintana">La Pintana</option><option value="el_bosque">El Bosque</option><option value="la_cisterna">La Cisterna</option><option value="san_miguel">San Miguel</option><option value="la_granja">La Granja</option><option value="peñalolen">Peñalolén</option></optgroup><optgroup label="─── Santiago Norte ───"><option value="quilicura">Quilicura</option><option value="huechuraba">Huechuraba</option><option value="conchali">Conchalí</option><option value="renca">Renca</option><option value="colina">Colina</option><option value="lampa">Lampa</option></optgroup><optgroup label="─── Santiago Poniente ───"><option value="maipu">Maipú</option><option value="cerrillos">Cerrillos</option><option value="pudahuel">Pudahuel</option><option value="estacion_central">Estación Central</option><option value="quinta_normal">Quinta Normal</option><option value="padre_hurtado">Padre Hurtado</option><option value="peñaflor">Peñaflor</option><option value="talagante">Talagante</option></optgroup><optgroup label="─── Regiones ───"><option value="rancagua">Rancagua</option><option value="valparaiso">Valparaíso</option><option value="vina">Viña del Mar</option><option value="talca">Talca</option><option value="chillan">Chillán</option><option value="concepcion">Concepción</option><option value="temuco">Temuco</option><option value="valdivia">Valdivia</option><option value="osorno">Osorno</option><option value="pmontt">Puerto Montt</option><option value="laserena">La Serena</option><option value="copiapo">Copiapó</option><option value="antofagasta">Antofagasta</option><option value="iquique">Iquique</option><option value="arica">Arica</option><option value="parenas">Punta Arenas</option></optgroup>';
+        document.getElementById('f-origen').innerHTML = LOC_HTML;
+        document.getElementById('f-destino').innerHTML = LOC_HTML;
 
-var iState={};
-INV.forEach(function(c,ci){c.items.forEach(function(_,ii){iState[ci+'-'+ii]=0;});});
+        var DIST = { stgo_centro: 0, providencia: 5, nunoa: 7, las_condes: 10, vitacura: 12, lo_barnechea: 20, recoleta: 4, independencia: 3, macul: 8, san_joaquin: 7, la_florida: 14, puente_alto: 25, san_bernardo: 20, la_pintana: 18, el_bosque: 15, la_cisterna: 10, san_miguel: 6, la_granja: 13, peñalolen: 12, quilicura: 15, huechuraba: 12, conchali: 6, renca: 8, colina: 30, lampa: 35, maipu: 14, cerrillos: 10, pudahuel: 16, estacion_central: 3, quinta_normal: 4, padre_hurtado: 30, peñaflor: 35, talagante: 40, rancagua: 87, valparaiso: 120, vina: 120, talca: 255, chillan: 400, concepcion: 500, temuco: 680, valdivia: 840, osorno: 920, pmontt: 1020, laserena: 470, copiapo: 800, antofagasta: 1340, iquique: 1780, arica: 2050, parenas: 3090 };
+        var NM = { stgo_centro: 'Santiago Centro', providencia: 'Providencia', nunoa: 'Ñuñoa', las_condes: 'Las Condes', vitacura: 'Vitacura', lo_barnechea: 'Lo Barnechea', recoleta: 'Recoleta', independencia: 'Independencia', macul: 'Macul', san_joaquin: 'San Joaquín', la_florida: 'La Florida', puente_alto: 'Puente Alto', san_bernardo: 'San Bernardo', la_pintana: 'La Pintana', el_bosque: 'El Bosque', la_cisterna: 'La Cisterna', san_miguel: 'San Miguel', la_granja: 'La Granja', peñalolen: 'Peñalolén', quilicura: 'Quilicura', huechuraba: 'Huechuraba', conchali: 'Conchalí', renca: 'Renca', colina: 'Colina', lampa: 'Lampa', maipu: 'Maipú', cerrillos: 'Cerrillos', pudahuel: 'Pudahuel', estacion_central: 'Estación Central', quinta_normal: 'Quinta Normal', padre_hurtado: 'Padre Hurtado', peñaflor: 'Peñaflor', talagante: 'Talagante', rancagua: 'Rancagua', valparaiso: 'Valparaíso', vina: 'Viña del Mar', talca: 'Talca', chillan: 'Chillán', concepcion: 'Concepción', temuco: 'Temuco', valdivia: 'Valdivia', osorno: 'Osorno', pmontt: 'Puerto Montt', laserena: 'La Serena', copiapo: 'Copiapó', antofagasta: 'Antofagasta', iquique: 'Iquique', arica: 'Arica', parenas: 'Punta Arenas' };
 
-function buildInv(){
-var h='';
-INV.forEach(function(c,ci){
-h+='<div class="inv-category"><div class="inv-cat-header" onclick="togCat(this,'+ci+')"><span class="cat-name"><span class="cat-icon">'+c.icon+'</span>'+c.name+'</span><span style="display:flex;align-items:center;gap:0.6rem;"><span class="cat-count" id="cc-'+ci+'"></span><span class="cat-arrow">▼</span></span></div><div class="inv-items" id="ci-'+ci+'">';
-c.items.forEach(function(it,ii){
-var k=ci+'-'+ii;
-h+='<div class="inv-item"><span class="inv-item-name">'+it.n+(it.h?'<span class="inv-item-heavy"> ⚠️+40kg</span>':'')+'</span><div class="inv-item-controls"><button class="inv-btn" onclick="chgInv(\''+k+'\',-1)">−</button><span class="inv-count" id="iv-'+k+'">0</span><button class="inv-btn" onclick="chgInv(\''+k+'\',1)">+</button></div></div>';
-});
-h+='</div></div>';
-});
-document.getElementById('inv-container').innerHTML=h;
-}
+        // h=heavy(>40kg), v=volume m3
+        var INV = [
+            {
+                name: 'Camas', icon: '🛏️', items: [
+                    { n: 'Cama King (incluye colchón)', v: 2.2, h: 1 }, { n: 'Cama 2 Plazas (incluye colchón)', v: 1.8, h: 1 }, { n: 'Cama 1½ Plaza (incluye colchón)', v: 1.2, h: 0 }, { n: 'Cama 1 Plaza (incluye colchón)', v: 0.8, h: 0 }, { n: 'Cama Nido (incluye colchón)', v: 1.0, h: 0 }, { n: 'Camarote (incluye colchón)', v: 1.8, h: 1 }, { n: 'Respaldo de cama pequeño', v: 0.15, h: 0 }, { n: 'Cuna desarmable', v: 0.3, h: 0 }, { n: 'Cuna no desarmable', v: 0.4, h: 0 }, { n: 'Colchón King o 2 Plazas', v: 0.8, h: 1 }, { n: 'Colchón 1 o 1½ Plaza', v: 0.5, h: 0 }, { n: 'Cama clínica', v: 1.5, h: 1 }, { n: 'Respaldo de cama mediano', v: 0.2, h: 0 }, { n: 'Respaldo de cama grande', v: 0.3, h: 0 }, { n: 'Base cama 1 plaza', v: 0.4, h: 0 }]
+            },
+            {
+                name: 'Cómodas y Veladores', icon: '🗄️', items: [
+                    { n: 'Velador', v: 0.15, h: 0 }, { n: 'Cómoda', v: 0.5, h: 0 }, { n: 'Estante', v: 0.5, h: 0 }, { n: 'Repisa escalera', v: 0.4, h: 0 }, { n: 'Biblioteca', v: 0.8, h: 1 }, { n: 'Rack TV pequeño', v: 0.25, h: 0 }, { n: 'Rack TV mediano', v: 0.4, h: 0 }, { n: 'Rack TV grande', v: 0.6, h: 1 }, { n: 'Bar', v: 0.5, h: 0 }, { n: 'Vitrina o Buffet', v: 0.8, h: 1 }, { n: 'Ropero', v: 1.2, h: 1 }, { n: 'Zapatera', v: 0.3, h: 0 }]
+            },
+            {
+                name: 'Mesas', icon: '🪑', items: [
+                    { n: 'Arrimo', v: 0.2, h: 0 }, { n: 'Escritorio mediano', v: 0.4, h: 0 }, { n: 'Escritorio grande', v: 0.6, h: 1 }, { n: 'Escritorio mediano de vidrio', v: 0.4, h: 0 }, { n: 'Escritorio grande de vidrio', v: 0.6, h: 1 }, { n: 'Mesa de centro', v: 0.3, h: 0 }, { n: 'Mesa de centro de vidrio', v: 0.3, h: 0 }, { n: 'Mesa lateral/nido', v: 0.15, h: 0 }, { n: 'Mesa lateral/nido de vidrio', v: 0.15, h: 0 }, { n: 'Mesa de cocina', v: 0.4, h: 0 }, { n: 'Mesa comedor 4 personas', v: 0.6, h: 0 }, { n: 'Mesa comedor 6 personas', v: 1.0, h: 1 }, { n: 'Mesa comedor 8 personas', v: 1.3, h: 1 }, { n: 'Mesa comedor 10 personas', v: 1.6, h: 1 }, { n: 'Mesa comedor vidrio 4 pers.', v: 0.6, h: 0 }, { n: 'Mesa comedor vidrio 6 pers.', v: 1.0, h: 1 }, { n: 'Mesa comedor vidrio 8 pers.', v: 1.3, h: 1 }, { n: 'Mesa comedor vidrio 10 pers.', v: 1.6, h: 1 }, { n: 'Tocador', v: 0.4, h: 0 }, { n: 'Mesa plegable', v: 0.2, h: 0 }]
+            },
+            {
+                name: 'Sofás', icon: '🛋️', items: [
+                    { n: 'Sitial', v: 0.5, h: 0 }, { n: 'Sillón', v: 0.6, h: 0 }, { n: 'Sofá 2 cuerpos', v: 1.2, h: 1 }, { n: 'Sofá 3 cuerpos', v: 1.8, h: 1 }, { n: 'Sofá 4 cuerpos', v: 2.4, h: 1 }, { n: 'Sillón en L', v: 2.5, h: 1 }, { n: 'Futón/Sofá cama 1 plaza', v: 0.8, h: 1 }, { n: 'Futón/Sofá cama 2 plazas', v: 1.2, h: 1 }, { n: 'Puf', v: 0.3, h: 0 }, { n: 'Bergere', v: 0.6, h: 0 }]
+            },
+            {
+                name: 'Sillas', icon: '💺', items: [
+                    { n: 'Silla de comedor', v: 0.15, h: 0 }, { n: 'Silla de cocina', v: 0.12, h: 0 }, { n: 'Silla de escritorio', v: 0.25, h: 0 }, { n: 'Silla reclinable', v: 0.4, h: 0 }, { n: 'Silla mecedora', v: 0.4, h: 0 }, { n: 'Piso de baja altura', v: 0.1, h: 0 }, { n: 'Piso alto', v: 0.15, h: 0 }, { n: 'Silla plegable', v: 0.08, h: 0 }, { n: 'Piso plástico apilable', v: 0.05, h: 0 }, { n: 'Banqueta comedor', v: 0.1, h: 0 }]
+            },
+            {
+                name: 'Cocina', icon: '🍳', items: [
+                    { n: 'Refrigerador 1 puerta', v: 0.8, h: 1 }, { n: 'Refrigerador 2 puertas Side by Side', v: 1.2, h: 1 }, { n: 'Congeladora o Freezer', v: 0.7, h: 1 }, { n: 'Frigobar', v: 0.2, h: 0 }, { n: 'Cava de vinos', v: 0.3, h: 0 }, { n: 'Cocina', v: 0.7, h: 1 }, { n: 'Horno eléctrico', v: 0.15, h: 0 }, { n: 'Microonda', v: 0.1, h: 0 }, { n: 'Lavadora', v: 0.5, h: 1 }, { n: 'Secadora', v: 0.5, h: 1 }, { n: 'Lavavajilla', v: 0.4, h: 1 }, { n: 'Artefactos pequeños', v: 0.05, h: 0 }]
+            },
+            {
+                name: 'Electrónica', icon: '📺', items: [
+                    { n: 'TV pequeña', v: 0.1, h: 0 }, { n: 'TV mediana', v: 0.15, h: 0 }, { n: 'TV grande', v: 0.25, h: 0 }, { n: 'TV gigante', v: 0.35, h: 0 }, { n: 'Computador de escritorio', v: 0.15, h: 0 }, { n: 'Impresora pequeña', v: 0.08, h: 0 }, { n: 'Impresora mediana', v: 0.15, h: 0 }, { n: 'Equipo de música', v: 0.2, h: 0 }, { n: 'Aspiradora', v: 0.1, h: 0 }, { n: 'AC portátil', v: 0.2, h: 0 }]
+            },
+            {
+                name: 'Lámparas', icon: '💡', items: [
+                    { n: 'Lámpara de noche', v: 0.05, h: 0 }, { n: 'Lámpara de pie', v: 0.1, h: 0 }, { n: 'Lámpara colgante', v: 0.08, h: 0 }, { n: 'Lámpara colgante de vidrio', v: 0.1, h: 0 }]
+            },
+            {
+                name: 'Terraza', icon: '🌿', items: [
+                    { n: 'Mesa de centro terraza', v: 0.3, h: 0 }, { n: 'Sofá terraza', v: 1.0, h: 0 }, { n: 'Sillón 2 cuerpos terraza', v: 0.8, h: 0 }, { n: 'Sillón 3 cuerpos terraza', v: 1.2, h: 1 }, { n: 'Silla de terraza', v: 0.12, h: 0 }, { n: 'Mesa comedor terraza 4 pers.', v: 0.6, h: 0 }, { n: 'Mesa comedor terraza 6 pers.', v: 1.0, h: 1 }, { n: 'Banca', v: 0.3, h: 0 }, { n: 'Macetero pequeño liviano', v: 0.05, h: 0 }, { n: 'Macetero grande pesado', v: 0.2, h: 1 }, { n: 'Parrilla', v: 0.5, h: 1 }, { n: 'Escalera pesada', v: 0.3, h: 1 }, { n: 'Casa de perro pequeña', v: 0.2, h: 0 }, { n: 'Casa de perro grande', v: 0.5, h: 1 }, { n: 'Silla Acapulco', v: 0.3, h: 0 }, { n: 'Reposera', v: 0.3, h: 0 }, { n: 'Macetero grande pesado (+50kg)', v: 0.25, h: 1 }, { n: 'Toldo', v: 0.2, h: 0 }, { n: 'Silla colgante', v: 0.4, h: 0 }]
+            },
+            {
+                name: 'Misceláneos', icon: '🎸', items: [
+                    { n: 'Alfombra pequeña', v: 0.1, h: 0 }, { n: 'Alfombra grande', v: 0.3, h: 0 }, { n: 'Baúl', v: 0.3, h: 0 }, { n: 'Biombo', v: 0.2, h: 0 }, { n: 'Canasto', v: 0.1, h: 0 }, { n: 'Cuadros pequeños', v: 0.05, h: 0 }, { n: 'Cuadros grandes', v: 0.1, h: 0 }, { n: 'Espejos', v: 0.1, h: 0 }, { n: 'Estufa a gas', v: 0.15, h: 0 }, { n: 'Estufa eléctrica pequeña', v: 0.08, h: 0 }, { n: 'Estufa eléctrica grande', v: 0.2, h: 0 }, { n: 'Bicicleta', v: 0.3, h: 0 }, { n: 'Bolso de golf y palos', v: 0.15, h: 0 }, { n: 'Trotadora/Elíptica', v: 0.5, h: 1 }, { n: 'Mesa de ping pong', v: 0.8, h: 1 }, { n: 'Mesa de taca taca', v: 0.6, h: 1 }, { n: 'Cama elástica', v: 0.5, h: 0 }, { n: 'Rascador de gatos', v: 0.15, h: 0 }, { n: 'Órgano eléctrico', v: 0.4, h: 1 }, { n: 'Guitarra/Bajo', v: 0.1, h: 0 }, { n: 'Piano vertical (sin cola)', v: 1.0, h: 1 }, { n: 'Piano de cola', v: 2.5, h: 1 }, { n: 'Perchero', v: 0.1, h: 0 }, { n: 'Mesa de planchado', v: 0.1, h: 0 }, { n: 'Banco de pesas', v: 0.3, h: 1 }, { n: 'Disco de pesa', v: 0.02, h: 1 }, { n: 'Casa de niños plástica', v: 0.5, h: 0 }, { n: 'Ventilador', v: 0.1, h: 0 }, { n: 'Pelota de pilates', v: 0.1, h: 0 }, { n: 'Escalera plegable pequeña', v: 0.1, h: 0 }, { n: 'Escalera plegable grande', v: 0.2, h: 0 }, { n: 'Almohada', v: 0.03, h: 0 }, { n: 'Cojín', v: 0.02, h: 0 }, { n: 'Dispensador de agua', v: 0.15, h: 0 }, { n: 'Colgador de ropa', v: 0.1, h: 0 }, { n: 'Tabla de surf', v: 0.2, h: 0 }, { n: 'Tabla de snowboard', v: 0.1, h: 0 }, { n: 'Bidón (20 litros)', v: 0.05, h: 0 }, { n: 'Cooler', v: 0.08, h: 0 }]
+            },
+            {
+                name: 'Oficinas Corporativas', icon: '🏢', items: [
+                    { n: 'Estación trabajo desarmable 1p', v: 0.5, h: 0 }, { n: 'Estación trabajo desarmable 2p', v: 1.0, h: 1 }, { n: 'Estación trabajo desarmable 3p', v: 1.5, h: 1 }, { n: 'Estación trabajo desarmable 4p', v: 2.0, h: 1 }, { n: 'Estación trabajo no desarmable 1p', v: 0.6, h: 1 }, { n: 'Estación trabajo no desarmable 2p', v: 1.2, h: 1 }, { n: 'Estación trabajo no desarmable 3p', v: 1.8, h: 1 }, { n: 'Estación trabajo no desarmable 4p', v: 2.4, h: 1 }, { n: 'Escritorio mediano desarmable', v: 0.4, h: 0 }, { n: 'Escritorio grande desarmable', v: 0.6, h: 0 }, { n: 'Escritorio mediano no desarmable', v: 0.5, h: 1 }, { n: 'Escritorio grande no desarmable', v: 0.7, h: 1 }, { n: 'Mesa reunión 4 pers.', v: 0.8, h: 1 }, { n: 'Mesa reunión 6 pers.', v: 1.0, h: 1 }, { n: 'Mesa reunión 8 pers.', v: 1.3, h: 1 }, { n: 'Mesa reunión 10 pers.', v: 1.6, h: 1 }, { n: 'Mesa reunión 12 pers.', v: 2.0, h: 1 }, { n: 'Archivador pequeño', v: 0.2, h: 0 }, { n: 'Archivador mediano', v: 0.3, h: 1 }, { n: 'Archivador grande', v: 0.5, h: 1 }, { n: 'Monitor 15-20"', v: 0.08, h: 0 }, { n: 'Monitor 20-25"', v: 0.1, h: 0 }, { n: 'Monitor 25-30"', v: 0.12, h: 0 }, { n: 'Combo PC sin monitor', v: 0.08, h: 0 }, { n: 'Impresora pequeña', v: 0.08, h: 0 }, { n: 'Impresora mediana', v: 0.15, h: 0 }, { n: 'Fotocopiadora grande', v: 0.6, h: 1 }, { n: 'Pizarra', v: 0.15, h: 0 }]
+            },
+            {
+                name: 'Industriales', icon: '🏭', items: [
+                    { n: 'Cocina industrial', v: 0.8, h: 1 }, { n: 'Freidora industrial', v: 0.3, h: 1 }, { n: 'Horno industrial', v: 1.0, h: 1 }, { n: 'Mesa fría industrial', v: 0.8, h: 1 }, { n: 'Mesa de trabajo industrial', v: 0.6, h: 1 }, { n: 'Plancha industrial', v: 0.3, h: 1 }, { n: 'Refrigerador/Congelador horizontal', v: 1.0, h: 1 }, { n: 'Refrigerador industrial dúplex', v: 1.5, h: 1 }, { n: 'Refrigerador industrial', v: 1.2, h: 1 }, { n: 'Lavaplatos industrial', v: 0.6, h: 1 }, { n: 'Batidora industrial', v: 0.2, h: 1 }, { n: 'Vitrina refrigerada', v: 0.8, h: 1 }, { n: 'Campana industrial', v: 0.4, h: 1 }]
+            },
+            {
+                name: 'Cajas y Maletas', icon: '📦', items: [
+                    { n: 'Caja de cocina', v: 0.06, h: 0 }, { n: 'Caja de adornos', v: 0.04, h: 0 }, { n: 'Caja de ropa', v: 0.06, h: 0 }, { n: 'Contenedor plástico (100L)', v: 0.1, h: 0 }, { n: 'Maleta pequeña', v: 0.06, h: 0 }, { n: 'Maleta grande', v: 0.12, h: 0 }, { n: 'Bolsa o bulto', v: 0.05, h: 0 }, { n: 'Caja de herramientas', v: 0.04, h: 0 }, { n: 'Caja fuerte de closet', v: 0.08, h: 1 }, { n: 'Caja fuerte vertical', v: 0.15, h: 1 }, { n: 'Contenedor plástico (50L)', v: 0.05, h: 0 }]
+            }
+        ];
 
-function togCat(el,ci){el.classList.toggle('open');document.getElementById('ci-'+ci).classList.toggle('open');}
-function chgInv(k,d){iState[k]=Math.max(0,iState[k]+d);document.getElementById('iv-'+k).textContent=iState[k];updInvSum();}
+        var iState = {};
+        INV.forEach(function (c, ci) { c.items.forEach(function (_, ii) { iState[ci + '-' + ii] = 0; }); });
 
-function updInvSum(){
-var tv=0,ti=0,th=0;
-INV.forEach(function(c,ci){var cc=0;c.items.forEach(function(it,ii){var q=iState[ci+'-'+ii];tv+=q*it.v;ti+=q;if(it.h)th+=q;cc+=q;});
-document.getElementById('cc-'+ci).textContent=cc>0?cc+' ítem'+(cc>1?'s':''):'';});
-document.getElementById('vol-t').textContent=tv.toFixed(1);
-document.getElementById('items-t').textContent=ti;
-document.getElementById('heavy-t').textContent=th;
-}
+        function buildInv() {
+            var h = '';
+            INV.forEach(function (c, ci) {
+                h += '<div class="inv-category"><div class="inv-cat-header" onclick="togCat(this,' + ci + ')"><span class="cat-name"><span class="cat-icon">' + c.icon + '</span>' + c.name + '</span><span style="display:flex;align-items:center;gap:0.6rem;"><span class="cat-count" id="cc-' + ci + '"></span><span class="cat-arrow">▼</span></span></div><div class="inv-items" id="ci-' + ci + '">';
+                c.items.forEach(function (it, ii) {
+                    var k = ci + '-' + ii;
+                    h += '<div class="inv-item"><span class="inv-item-name">' + it.n + (it.h ? '<span class="inv-item-heavy"> ⚠️+40kg</span>' : '') + '</span><div class="inv-item-controls"><button class="inv-btn" onclick="chgInv(\'' + k + '\',-1)">−</button><span class="inv-count" id="iv-' + k + '">0</span><button class="inv-btn" onclick="chgInv(\'' + k + '\',1)">+</button></div></div>';
+                });
+                h += '</div></div>';
+            });
+            document.getElementById('inv-container').innerHTML = h;
+        }
 
-function getVol(){var v=0;INV.forEach(function(c,ci){c.items.forEach(function(it,ii){v+=iState[ci+'-'+ii]*it.v;});});return v;}
-function getHeavy(){var h=0;INV.forEach(function(c,ci){c.items.forEach(function(it,ii){if(it.h)h+=iState[ci+'-'+ii];});});return h;}
+        function togCat(el, ci) { el.classList.toggle('open'); document.getElementById('ci-' + ci).classList.toggle('open'); }
+        function chgInv(k, d) { iState[k] = Math.max(0, iState[k] + d); document.getElementById('iv-' + k).textContent = iState[k]; updInvSum(); }
 
-function getInvText(){
-var lines=[];
-INV.forEach(function(c,ci){var r=[];c.items.forEach(function(it,ii){var q=iState[ci+'-'+ii];if(q>0)r.push(it.n+' x'+q);});if(r.length)lines.push(c.icon+' '+c.name+': '+r.join(', '));});
-return lines.join('\n');
-}
+        function updInvSum() {
+            var tv = 0, ti = 0, th = 0;
+            INV.forEach(function (c, ci) {
+                var cc = 0; c.items.forEach(function (it, ii) { var q = iState[ci + '-' + ii]; tv += q * it.v; ti += q; if (it.h) th += q; cc += q; });
+                document.getElementById('cc-' + ci).textContent = cc > 0 ? cc + ' ítem' + (cc > 1 ? 's' : '') : '';
+            });
+            document.getElementById('vol-t').textContent = tv.toFixed(1);
+            document.getElementById('items-t').textContent = ti;
+            document.getElementById('heavy-t').textContent = th;
+        }
 
-function selOpt(el,f){el.parentNode.querySelectorAll('.option-item').forEach(function(o){o.classList.remove('selected');});el.classList.add('selected');D[f]=el.getAttribute('data-value');}
+        function getVol() { var v = 0; INV.forEach(function (c, ci) { c.items.forEach(function (it, ii) { v += iState[ci + '-' + ii] * it.v; }); }); return v; }
+        function getHeavy() { var h = 0; INV.forEach(function (c, ci) { c.items.forEach(function (it, ii) { if (it.h) h += iState[ci + '-' + ii]; }); }); return h; }
 
-function updProg(){var b=document.getElementById('pbar');var h='';for(var i=1;i<=STEPS;i++){var c='progress-step';if(i<cur)c+=' done';if(i===cur)c+=' active';h+='<div class="'+c+'"></div>';}b.innerHTML=h;}
+        function getInvText() {
+            var lines = [];
+            INV.forEach(function (c, ci) { var r = []; c.items.forEach(function (it, ii) { var q = iState[ci + '-' + ii]; if (q > 0) r.push(it.n + ' x' + q); }); if (r.length) lines.push(c.icon + ' ' + c.name + ': ' + r.join(', ')); });
+            return lines.join('\n');
+        }
 
-function showStep(n){document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active');});document.getElementById('s-'+n).classList.add('active');cur=n;updProg();window.scrollTo({top:0,behavior:'smooth'});}
+        function selOpt(el, f) { el.parentNode.querySelectorAll('.option-item').forEach(function (o) { o.classList.remove('selected'); }); el.classList.add('selected'); D[f] = el.getAttribute('data-value'); }
 
-function go(n){
-if(n===2){if(!document.getElementById('f-nombre').value.trim()){alert('Ingresa tu nombre');return;}document.getElementById('greet-fecha').textContent=document.getElementById('f-nombre').value+', ¿para cuándo es la mudanza?';document.getElementById('f-fecha').min=new Date().toISOString().split('T')[0];}
-if(n===4){if(!document.getElementById('f-origen').value||!document.getElementById('f-tv-o').value){alert('Completa origen y tipo de vivienda');return;}}
-if(n===5){if(!document.getElementById('f-destino').value||!document.getElementById('f-tv-d').value){alert('Completa destino y tipo de vivienda');return;}}
-if(n===8){buildInv();}
-if(n===9){}
-if(n===10){if(!document.getElementById('f-email').value||!document.getElementById('f-tel').value){alert('Ingresa tu email y teléfono');return;}showStep(10);setTimeout(function(){calcResult();showStep(11);},2000);return;}
-showStep(n);
-}
+        function updProg() { var b = document.getElementById('pbar'); var h = ''; for (var i = 1; i <= STEPS; i++) { var c = 'progress-step'; if (i < cur) c += ' done'; if (i === cur) c += ' active'; h += '<div class="' + c + '"></div>'; } b.innerHTML = h; }
 
-function calcResult(){
-var nombre=document.getElementById('f-nombre').value;
-var orig=document.getElementById('f-origen').value;
-var dest=document.getElementById('f-destino').value;
-var fecha=document.getElementById('f-fecha').value;
-var vol=getVol();if(vol<3)vol=3;
-var heavy=getHeavy();
+        function showStep(n) { document.querySelectorAll('.step').forEach(function (s) { s.classList.remove('active'); }); document.getElementById('s-' + n).classList.add('active'); cur = n; updProg(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-var d1=DIST[orig]||0,d2=DIST[dest]||0;
-var km=(d1<50&&d2<50)?Math.abs(d2-d1)+10:Math.abs(d2-d1)||Math.max(d1,d2);
+        function go(n) {
+            if (n === 2) { if (!document.getElementById('f-nombre').value.trim()) { alert('Ingresa tu nombre'); return; } document.getElementById('greet-fecha').textContent = document.getElementById('f-nombre').value + ', ¿para cuándo es la mudanza?'; document.getElementById('f-fecha').min = new Date().toISOString().split('T')[0]; }
+            if (n === 4) { if (!document.getElementById('f-origen').value || !document.getElementById('f-tv-o').value) { alert('Completa origen y tipo de vivienda'); return; } }
+            if (n === 5) { if (!document.getElementById('f-destino').value || !document.getElementById('f-tv-d').value) { alert('Completa destino y tipo de vivienda'); return; } }
+            if (n === 8) { buildInv(); }
+            if (n === 9) { }
+            if (n === 10) { if (!document.getElementById('f-email').value || !document.getElementById('f-tel').value) { alert('Ingresa tu email y teléfono'); return; } showStep(10); setTimeout(function () { calcResult(); showStep(11); }, 2000); return; }
+            showStep(n);
+        }
 
-// PRICING: at 15m3 local → Basica=130k, Estandar=230k, Premium=350k
-var pB=60000+vol*4667;
-var pE=80000+vol*10000;
-var pP=110000+vol*16000;
+        function calcResult() {
+            var nombre = document.getElementById('f-nombre').value;
+            var orig = document.getElementById('f-origen').value;
+            var dest = document.getElementById('f-destino').value;
+            var fecha = document.getElementById('f-fecha').value;
+            var vol = getVol(); if (vol < 3) vol = 3;
+            var heavy = getHeavy();
 
-// Distance surcharge
-if(km>50){var kmCost=km*600;pB+=kmCost;pE+=kmCost;pP+=kmCost;}
+            var d1 = DIST[orig] || 0, d2 = DIST[dest] || 0;
+            var km = (d1 < 50 && d2 < 50) ? Math.abs(d2 - d1) + 10 : Math.abs(d2 - d1) || Math.max(d1, d2);
 
-// Access surcharges
-var accCost=0;
-if(D.ao==='lejos')accCost+=15000;if(D.ao==='sub')accCost+=25000;
-if(D.ad==='lejos')accCost+=15000;if(D.ad==='sub')accCost+=25000;
-pB+=accCost;pE+=accCost;pP+=accCost;
+            // PRICING: at 15m3 local → Basica=130k, Estandar=230k, Premium=350k
+            var pB = 60000 + vol * 4667;
+            var pE = 80000 + vol * 10000;
+            var pP = 110000 + vol * 16000;
 
-// Heavy items surcharge (>40kg) - $5000 per heavy item
-var heavyCost=heavy*5000;
-pB+=heavyCost;pE+=heavyCost;pP+=heavyCost;
+            // Distance surcharge - $1250/km normal, $1400/km premium
+            if (km > 50) { var kmNormal = km * 1250; var kmPremium = km * 1400; pB += kmNormal; pE += kmNormal; pP += kmPremium; }
 
-// Fragile surcharge
-if(D.fragil==='si'){pB+=15000;pE+=10000;pP+=0;}
+            // Access surcharges
+            var accCost = 0;
+            if (D.ao === 'lejos') accCost += 15000; if (D.ao === 'sub') accCost += 25000;
+            if (D.ad === 'lejos') accCost += 15000; if (D.ad === 'sub') accCost += 25000;
+            pB += accCost; pE += accCost; pP += accCost;
 
-// Minimums
-if(pB<130000)pB=130000;
+            // Heavy items surcharge (>40kg) - $5000 per heavy item
+            var heavyCost = heavy * 5000;
+            pB += heavyCost; pE += heavyCost; pP += heavyCost;
 
-// Round to nearest 1000
-pB=Math.ceil(pB/1000)*1000;
-pE=Math.ceil(pE/1000)*1000;
-pP=Math.ceil(pP/1000)*1000;
+            // Fragile surcharge
+            if (D.fragil === 'si') { pB += 15000; pE += 10000; pP += 0; }
 
-document.getElementById('res-title').textContent=nombre+', ¡ya tenemos tu precio!';
+            // Minimums
+            if (pB < 130000) pB = 130000;
 
-var info='';
-info+='<div class="ri-row"><span class="l">Ruta</span><span class="v">'+(NM[orig]||orig)+' → '+(NM[dest]||dest)+'</span></div>';
-info+='<div class="ri-row"><span class="l">Distancia</span><span class="v">'+(km>50?km+' km':'Local Santiago')+'</span></div>';
-info+='<div class="ri-row"><span class="l">Volumen</span><span class="v">'+vol.toFixed(1)+' m³</span></div>';
-info+='<div class="ri-row"><span class="l">Ítems pesados (+40kg)</span><span class="v">'+heavy+'</span></div>';
-if(fecha)info+='<div class="ri-row"><span class="l">Fecha</span><span class="v">'+fecha+'</span></div>';
-info+='<div class="ri-row"><span class="l">Frágil</span><span class="v">'+(D.fragil==='si'?'Sí':'No')+'</span></div>';
-document.getElementById('res-info').innerHTML=info;
+            // Round to nearest 1000
+            pB = Math.ceil(pB / 1000) * 1000;
+            pE = Math.ceil(pE / 1000) * 1000;
+            pP = Math.ceil(pP / 1000) * 1000;
 
-var plans=[
-{id:'basica',name:'EasyRoads Básica',ft:['Solo transporte','Armado y desarmado: camas','Protección mobiliario: film','Embalaje de cajas: usted'],price:pB},
-{id:'estandar',name:'EasyRoads Estándar',ft:['Chofer + 2 peonetas','Armado: camas + muebles básicos','Protección: film + frazada','Embalaje de cajas: usted'],price:pE,rec:true},
-{id:'premium',name:'EasyRoads Premium',ft:['Equipo completo dedicado','Armado: camas + todos los muebles','Protección: film + frazada + cartón','Embalaje completo: empresa'],price:pP}
-];
+            document.getElementById('res-title').textContent = nombre + ', ¡ya tenemos tu precio!';
 
-var ph='';
-plans.forEach(function(p){
-ph+='<div class="plan'+(p.rec?' recommended selected':'')+'" onclick="selPlan(this,\''+p.id+'\','+p.price+')">';
-if(p.rec)ph+='<div class="plan-badge">Recomendado</div>';
-ph+='<div class="plan-name">'+p.name+'</div><ul class="plan-features">';
-p.ft.forEach(function(f){ph+='<li>'+f+'</li>';});
-ph+='</ul><div class="plan-price">'+fCLP(p.price)+' <span class="plan-price-sub">CLP</span></div></div>';
-});
-document.getElementById('plans-c').innerHTML=ph;
-D.plan='estandar';D.price=pE;
-updWA();
-}
+            var info = '';
+            info += '<div class="ri-row"><span class="l">Ruta</span><span class="v">' + (NM[orig] || orig) + ' → ' + (NM[dest] || dest) + '</span></div>';
+            info += '<div class="ri-row"><span class="l">Distancia</span><span class="v">' + (km > 50 ? km + ' km' : 'Local Santiago') + '</span></div>';
+            info += '<div class="ri-row"><span class="l">Volumen</span><span class="v">' + vol.toFixed(1) + ' m³</span></div>';
+            info += '<div class="ri-row"><span class="l">Ítems pesados (+40kg)</span><span class="v">' + heavy + '</span></div>';
+            if (fecha) info += '<div class="ri-row"><span class="l">Fecha</span><span class="v">' + fecha + '</span></div>';
+            info += '<div class="ri-row"><span class="l">Frágil</span><span class="v">' + (D.fragil === 'si' ? 'Sí' : 'No') + '</span></div>';
+            document.getElementById('res-info').innerHTML = info;
 
-function selPlan(el,id,pr){document.querySelectorAll('.plan').forEach(function(p){p.classList.remove('selected');});el.classList.add('selected');D.plan=id;D.price=pr;updWA();}
+            var plans = [
+                { id: 'basica', name: 'EasyRoads Básica', ft: ['Solo transporte', 'Armado y desarmado: camas', 'Protección mobiliario: film', 'Embalaje de cajas: usted'], price: pB },
+                { id: 'estandar', name: 'EasyRoads Estándar', ft: ['Chofer + 2 peonetas', 'Armado: camas + muebles básicos', 'Protección: film + frazada', 'Embalaje de cajas: usted'], price: pE, rec: true },
+                { id: 'premium', name: 'EasyRoads Premium', ft: ['Equipo completo dedicado', 'Armado: camas + todos los muebles', 'Protección: film + frazada + cartón', 'Embalaje completo: empresa'], price: pP }
+            ];
 
-function updWA(){
-var n=document.getElementById('f-nombre').value+' '+document.getElementById('f-apellido').value;
-var o=NM[document.getElementById('f-origen').value]||'';
-var d=NM[document.getElementById('f-destino').value]||'';
-var f=document.getElementById('f-fecha').value;
-var v=getVol();var h=getHeavy();
-var pn={basica:'Básica',estandar:'Estándar',premium:'Premium'};
-var m='Hola, cotice en su web y quiero reservar:\n\n';
-m+='*Nombre:* '+n+'\n*Plan:* EasyRoads '+pn[D.plan]+'\n*Ruta:* '+o+' → '+d+'\n*Volumen:* '+v.toFixed(1)+' m³\n*Pesados (+40kg):* '+h+'\n*Frágil:* '+(D.fragil==='si'?'Sí':'No')+'\n';
-if(f)m+='*Fecha:* '+f+'\n';
-m+='*Precio:* '+fCLP(D.price)+'\n';
-var inv=getInvText();if(inv)m+='\n*Inventario:*\n'+inv+'\n';
-m+='\n¿Me pueden confirmar disponibilidad?';
-document.getElementById('btn-wa').href='https://wa.me/'+WA+'?text='+encodeURIComponent(m);
-}
+            var ph = '';
+            plans.forEach(function (p) {
+                ph += '<div class="plan' + (p.rec ? ' recommended selected' : '') + '" onclick="selPlan(this,\'' + p.id + '\',' + p.price + ')">';
+                if (p.rec) ph += '<div class="plan-badge">Recomendado</div>';
+                ph += '<div class="plan-name">' + p.name + '</div><ul class="plan-features">';
+                p.ft.forEach(function (f) { ph += '<li>' + f + '</li>'; });
+                ph += '</ul><div class="plan-price">' + fCLP(p.price) + ' <span class="plan-price-sub">CLP</span></div></div>';
+            });
+            document.getElementById('plans-c').innerHTML = ph;
+            D.plan = 'estandar'; D.price = pE;
+            updWA();
 
-function fCLP(n){return '$'+Math.round(n).toLocaleString('es-CL');}
-updProg();
-</script>
+            // ===== ENVIAR EMAILS CON EMAILJS =====
+            var emailCliente = document.getElementById('f-email').value;
+            var telefonoCliente = document.getElementById('f-tel').value;
+            var apellido = document.getElementById('f-apellido').value;
+            var origNombre = NM[orig] || orig;
+            var destNombre = NM[dest] || dest;
+            var distanciaTexto = km > 50 ? km + ' km' : 'Local Santiago';
+
+            // Params para la template "Contact Us" (te llega a ti)
+            var paramsContacto = {
+                nombre: nombre + ' ' + apellido,
+                email: emailCliente,
+                telefono: '+56 ' + telefonoCliente,
+                origen: origNombre,
+                destino: destNombre,
+                distancia: distanciaTexto,
+                volumen: vol.toFixed(1),
+                items_pesados: heavy,
+                fecha: fecha || 'No especificada',
+                fragil: D.fragil === 'si' ? 'Sí' : 'No',
+                precio_basico: fCLP(pB),
+                precio_estandar: fCLP(pE),
+                precio_premium: fCLP(pP),
+                mensaje: getInvText() || 'Sin inventario detallado'
+            };
+
+            // Params para la template "Auto-Reply" (le llega al cliente)
+            var paramsAutoReply = {
+                nombre: nombre,
+                email: emailCliente,
+                origen: origNombre,
+                destino: destNombre,
+                distancia: distanciaTexto,
+                volumen: vol.toFixed(1),
+                items_pesados: heavy,
+                fecha: fecha || 'No especificada',
+                fragil: D.fragil === 'si' ? 'Sí' : 'No',
+                precio_basico: fCLP(pB),
+                precio_estandar: fCLP(pE),
+                precio_premium: fCLP(pP)
+            };
+
+            // Enviar notificación a ti (Contact Us)
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CONTACT, paramsContacto)
+                .then(function (r) { console.log('Email contacto enviado:', r.status); })
+                .catch(function (e) { console.error('Error email contacto:', e); });
+
+            // Enviar auto-reply al cliente
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, paramsAutoReply)
+                .then(function (r) { console.log('Auto-reply enviado:', r.status); })
+                .catch(function (e) { console.error('Error auto-reply:', e); });
+            // ======================================
+        }
+
+        function selPlan(el, id, pr) { document.querySelectorAll('.plan').forEach(function (p) { p.classList.remove('selected'); }); el.classList.add('selected'); D.plan = id; D.price = pr; updWA(); }
+
+        function updWA() {
+            var n = document.getElementById('f-nombre').value + ' ' + document.getElementById('f-apellido').value;
+            var o = NM[document.getElementById('f-origen').value] || '';
+            var d = NM[document.getElementById('f-destino').value] || '';
+            var f = document.getElementById('f-fecha').value;
+            var v = getVol(); var h = getHeavy();
+            var pn = { basica: 'Básica', estandar: 'Estándar', premium: 'Premium' };
+            var m = 'Hola, cotice en su web y quiero reservar:\n\n';
+            m += '*Nombre:* ' + n + '\n*Plan:* EasyRoads ' + pn[D.plan] + '\n*Ruta:* ' + o + ' → ' + d + '\n*Volumen:* ' + v.toFixed(1) + ' m³\n*Pesados (+40kg):* ' + h + '\n*Frágil:* ' + (D.fragil === 'si' ? 'Sí' : 'No') + '\n';
+            if (f) m += '*Fecha:* ' + f + '\n';
+            m += '*Precio:* ' + fCLP(D.price) + '\n';
+            var inv = getInvText(); if (inv) m += '\n*Inventario:*\n' + inv + '\n';
+            m += '\n¿Me pueden confirmar disponibilidad?';
+            document.getElementById('btn-wa').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(m);
+        }
+
+        function fCLP(n) { return '$' + Math.round(n).toLocaleString('es-CL'); }
+        updProg();
+    </script>
 </body>
+
 </html>
