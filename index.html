@@ -1151,15 +1151,21 @@
                 precio_premium: fCLP(pP)
             };
 
+            // Verificar que emailjs está cargado
+            if (typeof emailjs === 'undefined') {
+                alert('ERROR: EmailJS SDK no se cargó. Asegúrate de tener conexión a internet.');
+                return;
+            }
+
             // Enviar notificación a ti (Contact Us)
             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CONTACT, paramsContacto)
-                .then(function (r) { console.log('Email contacto enviado:', r.status); })
-                .catch(function (e) { console.error('Error email contacto:', e); });
+                .then(function (r) { console.log('Email contacto enviado:', r.status); alert('✅ Email de notificación enviado correctamente!'); })
+                .catch(function (e) { console.error('Error email contacto:', e); alert('❌ Error enviando email contacto: ' + JSON.stringify(e)); });
 
             // Enviar auto-reply al cliente
             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, paramsAutoReply)
-                .then(function (r) { console.log('Auto-reply enviado:', r.status); })
-                .catch(function (e) { console.error('Error auto-reply:', e); });
+                .then(function (r) { console.log('Auto-reply enviado:', r.status); alert('✅ Auto-reply al cliente enviado!'); })
+                .catch(function (e) { console.error('Error auto-reply:', e); alert('❌ Error enviando auto-reply: ' + JSON.stringify(e)); });
             // ======================================
         }
 
