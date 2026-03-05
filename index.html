@@ -1082,11 +1082,13 @@
             info += '<div class="ri-row"><span class="l">Frágil</span><span class="v">' + (D.fragil === 'si' ? 'Sí' : 'No') + '</span></div>';
             document.getElementById('res-info').innerHTML = info;
 
-            var plans = [
-                { id: 'basica', name: 'EasyRoads Básica', ft: ['Solo transporte', 'Armado y desarmado: camas', 'Protección mobiliario: film', 'Embalaje de cajas: usted'], price: pB },
-                { id: 'estandar', name: 'EasyRoads Estándar', ft: ['Chofer + 2 peonetas', 'Armado: camas + muebles básicos', 'Protección: film + frazada', 'Embalaje de cajas: usted'], price: pE, rec: true },
-                { id: 'premium', name: 'EasyRoads Premium', ft: ['Equipo completo dedicado', 'Armado: camas + todos los muebles', 'Protección: film + frazada + cartón', 'Embalaje completo: empresa'], price: pP }
-            ];
+            var isRegional = km > 50;
+            var plans = [];
+            if (!isRegional) {
+                plans.push({ id: 'basica', name: 'EasyRoads Básica', ft: ['Solo transporte', 'Armado y desarmado: camas', 'Protección mobiliario: film', 'Embalaje de cajas: usted'], price: pB });
+            }
+            plans.push({ id: 'estandar', name: 'EasyRoads Estándar', ft: ['Chofer + 2 peonetas', 'Armado: camas + muebles básicos', 'Protección: film + frazada', 'Embalaje de cajas: usted'], price: pE, rec: true });
+            plans.push({ id: 'premium', name: 'EasyRoads Premium', ft: ['Equipo completo dedicado', 'Armado: camas + todos los muebles', 'Protección: film + frazada + cartón', 'Embalaje completo: empresa'], price: pP });
 
             var ph = '';
             plans.forEach(function (p) {
@@ -1108,8 +1110,12 @@
             var destNombre = NM[dest] || dest;
             var distanciaTexto = km > 50 ? km + ' km' : 'Local Santiago';
 
+            // Resumen de precios según si es regional o local
+            var precioBasicoTxt = isRegional ? 'N/A (solo local)' : fCLP(pB);
+
             // Params para la template "Contact Us" (te llega a ti)
             var paramsContacto = {
+                name: nombre + ' ' + apellido,
                 nombre: nombre + ' ' + apellido,
                 email: emailCliente,
                 telefono: '+56 ' + telefonoCliente,
@@ -1120,16 +1126,19 @@
                 items_pesados: heavy,
                 fecha: fecha || 'No especificada',
                 fragil: D.fragil === 'si' ? 'Sí' : 'No',
-                precio_basico: fCLP(pB),
+                precio_basico: precioBasicoTxt,
                 precio_estandar: fCLP(pE),
                 precio_premium: fCLP(pP),
+                message: getInvText() || 'Sin inventario detallado',
                 mensaje: getInvText() || 'Sin inventario detallado'
             };
 
             // Params para la template "Auto-Reply" (le llega al cliente)
             var paramsAutoReply = {
+                name: nombre,
                 nombre: nombre,
                 email: emailCliente,
+                to_email: emailCliente,
                 origen: origNombre,
                 destino: destNombre,
                 distancia: distanciaTexto,
@@ -1137,7 +1146,7 @@
                 items_pesados: heavy,
                 fecha: fecha || 'No especificada',
                 fragil: D.fragil === 'si' ? 'Sí' : 'No',
-                precio_basico: fCLP(pB),
+                precio_basico: precioBasicoTxt,
                 precio_estandar: fCLP(pE),
                 precio_premium: fCLP(pP)
             };
