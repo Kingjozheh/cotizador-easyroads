@@ -1157,8 +1157,8 @@
         // REEMPLAZA estos valores con los tuyos de dashboard.emailjs.com
         var EMAILJS_PUBLIC_KEY = 'wQLT-fIiwYVAE3-9B';
         var EMAILJS_SERVICE_ID = 'service_q1ewnsm';
-        var EMAILJS_TEMPLATE_CONTACT = 'template_na6tvtr';    // Template "Contact Us" (notificación a ti)
-        var EMAILJS_TEMPLATE_AUTOREPLY = 'template_a18wpvh';  // Template "Auto-Reply" (respuesta al cliente)
+        var EMAILJS_TEMPLATE_MUDANZA = 'template_a18wpvh';     // Auto-Reply → se usa para MUDANZAS (al cliente + a ti)
+        var EMAILJS_TEMPLATE_ARRIENDO = 'template_na6tvtr';   // Contact Us → se usa para ARRIENDOS (al cliente + a ti)
 
         (function () { if (typeof emailjs !== 'undefined') { emailjs.init(EMAILJS_PUBLIC_KEY); } else { console.warn('EmailJS SDK no cargado'); } })();
         // ==========================
@@ -1248,8 +1248,8 @@
         INV.forEach(function (c, ci) { c.items.forEach(function (_, ii) { iState[ci + '-' + ii] = 0; }); });
 
         var VEHICLE_DATA = {
-            peugeot: { name: 'Peugeot Partner', icon: '🚚', capacity: '800 kg / 3.3 m³', prices: { diario: 34990, semanal: 209940, quincenal: 400000, mensual: 650000 } },
-            kyc: { name: 'KYC X5 Cargo Box', icon: '🚛', capacity: '1,500 kg / 8 m³', prices: { diario: 55000, semanal: 359940, quincenal: 550000, mensual: 800000 } }
+            peugeot: { name: 'Peugeot Partner', icon: '🚚', capacity: '800 kg / 3.3 m³', prices: { diario: 45000, semanal: 250000, quincenal: 400000, mensual: 650000 } },
+            kyc: { name: 'KYC X5 Cargo Box', icon: '🚛', capacity: '1,500 kg / 8 m³', prices: { diario: 55000, semanal: 300000, quincenal: 480000, mensual: 800000 } }
         };
 
         function buildInv() {
@@ -1422,22 +1422,20 @@
             D.plan = 'estandar'; D.price = pE;
             updWA();
 
-            // ===== ENVIAR EMAILS CON EMAILJS =====
+            // ===== ENVIAR EMAIL MUDANZA (usa template Auto-Reply para todo) =====
             var emailCliente = document.getElementById('f-email').value;
             var telefonoCliente = document.getElementById('f-tel').value;
             var apellido = document.getElementById('f-apellido').value;
             var origNombre = NM[orig] || orig;
             var destNombre = NM[dest] || dest;
             var distanciaTexto = km > 50 ? km + ' km' : 'Local Santiago';
-
-            // Resumen de precios según si es regional o local
             var precioBasicoTxt = isRegional ? 'N/A (solo local)' : fCLP(pB);
 
-            // Params para la template "Contact Us" (te llega a ti)
-            var paramsContacto = {
+            var paramsMudanza = {
                 name: nombre + ' ' + apellido,
-                nombre: nombre + ' ' + apellido,
+                nombre: nombre,
                 email: emailCliente,
+                to_email: emailCliente,
                 telefono: '+56 ' + telefonoCliente,
                 origen: origNombre,
                 destino: destNombre,
@@ -1453,40 +1451,15 @@
                 mensaje: getInvText() || 'Sin inventario detallado'
             };
 
-            // Params para la template "Auto-Reply" (le llega al cliente)
-            var paramsAutoReply = {
-                name: nombre,
-                nombre: nombre,
-                email: emailCliente,
-                to_email: emailCliente,
-                origen: origNombre,
-                destino: destNombre,
-                distancia: distanciaTexto,
-                volumen: vol.toFixed(1),
-                telefono: '+56 ' + telefonoCliente,
-                items_pesados: heavy,
-                fecha: fecha || 'No especificada',
-                fragil: D.fragil === 'si' ? 'Sí' : 'No',
-                precio_basico: precioBasicoTxt,
-                precio_estandar: fCLP(pE),
-                precio_premium: fCLP(pP)
-            };
-
-            // Verificar que emailjs está cargado
             if (typeof emailjs === 'undefined') {
                 alert('ERROR: EmailJS SDK no se cargó. Asegúrate de tener conexión a internet.');
                 return;
             }
 
-            // Enviar notificación a ti (Contact Us)
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CONTACT, paramsContacto)
-                .then(function (r) { console.log('Email contacto enviado:', r.status); })
-                .catch(function (e) { console.error('Error email contacto:', e); });
-
-            // Enviar auto-reply al cliente
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, paramsAutoReply)
-                .then(function (r) { console.log('Auto-reply enviado:', r.status); })
-                .catch(function (e) { console.error('Error auto-reply:', e); });
+            // Un solo envío: template Auto-Reply (llega al cliente Y a ti via CC/BCC en EmailJS)
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_MUDANZA, paramsMudanza)
+                .then(function (r) { console.log('Email mudanza enviado:', r.status); })
+                .catch(function (e) { console.error('Error email mudanza:', e); });
             // ======================================
         }
 
@@ -1518,11 +1491,12 @@
             var m = 'Hola, quiero arrendar un ' + vehicleName + ' por ' + periodTexto + '. Mi nombre es ' + nombre + ' ' + apellido + '. Precio: ' + fCLP(precioTotal) + '. ¿Tienen disponibilidad?';
             document.getElementById('btn-wa-arr').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(m);
 
-            // ===== ENVIAR EMAILS CON EMAILJS (ARRIENDO) =====
-            var paramsContactoArr = {
+            // ===== ENVIAR EMAIL ARRIENDO (usa template Contact Us) =====
+            var paramsArriendo = {
                 name: nombre + ' ' + apellido,
-                nombre: nombre + ' ' + apellido,
+                nombre: nombre,
                 email: emailCliente,
+                to_email: emailCliente,
                 telefono: '+56 ' + telefonoCliente,
                 vehiculo: vehicleName,
                 periodo: periodTexto,
@@ -1533,31 +1507,15 @@
                 mensaje: 'Solicitud de arriendo de vehículo'
             };
 
-            var paramsAutoReplyArr = {
-                name: nombre,
-                nombre: nombre,
-                email: emailCliente,
-                to_email: emailCliente,
-                vehiculo: vehicleName,
-                periodo: periodTexto,
-                telefono: '+56 ' + telefonoCliente,
-                precio_neto: fCLP(precioBase),
-                precio_iva: fCLP(precioIVA),
-                precio_total: fCLP(precioTotal)
-            };
-
             if (typeof emailjs === 'undefined') {
                 alert('ERROR: EmailJS SDK no se cargó. Asegúrate de tener conexión a internet.');
                 return;
             }
 
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CONTACT, paramsContactoArr)
-                .then(function (r) { console.log('Email arriendo contacto enviado:', r.status); })
-                .catch(function (e) { console.error('Error email arriendo contacto:', e); });
-
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, paramsAutoReplyArr)
-                .then(function (r) { console.log('Auto-reply arriendo enviado:', r.status); })
-                .catch(function (e) { console.error('Error auto-reply arriendo:', e); });
+            // Un solo envío: template Contact Us (llega al cliente Y a ti via CC/BCC en EmailJS)
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ARRIENDO, paramsArriendo)
+                .then(function (r) { console.log('Email arriendo enviado:', r.status); })
+                .catch(function (e) { console.error('Error email arriendo:', e); });
             // ======================================
         }
 
